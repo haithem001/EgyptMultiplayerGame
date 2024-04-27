@@ -1,7 +1,5 @@
 
 
-import NPCS.Dude;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -20,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Game extends JPanel implements ActionListener {
+	private boolean DRAWBLOCK = false;
 	private volatile int screenX;
 	private volatile int screenY;
 	private Timer timer;
@@ -36,17 +35,31 @@ public class Game extends JPanel implements ActionListener {
 	private int dudeAnimCount = DUDE_ANIM_DELAY ;
 	private int dudeAnimDir = 1;
 	private int dudeAnimPos = 0;
-
+	private int platform =850;
 	public Dude dude;
+	public Dude[] dudes={
+
+	};
 	public Rectangle solidarea;
+	private BLOCK[] BLOCKS = new BLOCK[]{
+		new BLOCK(600, 861 , 70, 70),
+	};
+
+	public int MouseX,MouseY;
 	public HUD hud;
+
+
+
+
 
 	public Game()  {
 
 		initGame();
 		initMap();
 
-	}
+
+
+    }
 
 	private void initMap() {
 	}
@@ -76,10 +89,12 @@ public class Game extends JPanel implements ActionListener {
 
 
 		dude.setX(252);
-		dude.setY(252);
-		this.solidarea = new Rectangle();
+		dude.setY(platform - dude.getHeight());
+
+
 		timer = new Timer(DELAY, this);
 		timer.start();
+
 
 		MouseEvents();
 	}
@@ -99,6 +114,7 @@ public class Game extends JPanel implements ActionListener {
 		}
 
 	}
+
 
 
 
@@ -123,14 +139,42 @@ public class Game extends JPanel implements ActionListener {
 
 
 		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.fillRect(0, 931, this.getWidth(), 5);
+		Color c = new Color(255, 0, 34);
+
+
+		g2d.setColor(c);
+
+		System.out.println(Math.cos(MouseX)+","+Math.sin(MouseY));
+
+		float XLEN= MouseX-(dude.getX()+(dude.getWidth()/2));
+		float YLEN= MouseY-(dude.getY()+(dude.getHeight()/2));
+
+		double length = Math.sqrt(XLEN*XLEN + YLEN*YLEN);
+
+		g2d.fillOval((int) ((dude.getX()+dude.getWidth()/2)+XLEN*80/length)-5, (int) ((dude.getY()+dude.getHeight()/2)+YLEN*80/length), 10, 10);
+
 		// board
 		if (dude.isWalking() == true) {
 
 			doAnim(2);
 		}
+
+
 		MapAnim();
-		DrawArea(g);
 		DrawPlayer(g);
+		if(dude.building ){
+			BLOCKS[0].BlockAnim();
+				DrawArea(g,true);
+				if (BLOCKS[0].BlockAnimPos==3){
+					DRAWBLOCK=true;
+
+				}
+
+		}
+		if (DRAWBLOCK==true) {DrawArea(g,false);}
+
 		this.repaint();
 
 		Toolkit.getDefaultToolkit().sync();
@@ -145,14 +189,9 @@ public class Game extends JPanel implements ActionListener {
 
 				int x = e.getX();
 				int y = e.getY();
-				if (hud.getX() + hud.getW() - 15 >= x && x >= hud.getX() + hud.getW() - 75 && y >= hud.getY() + 11
-						&& y <= hud.getY() + 81 && hud.GetInventoryOpen() == false) {
-					hud.SetInventoryOpen(true);
-				} else if (hud.getX() + hud.getW() - 15 >= x && x >= hud.getX() + hud.getW() - 75
-						&& y >= hud.getY() + 11 && y <= hud.getY() + 81 && hud.GetInventoryOpen() == true) {
-					hud.SetInventoryOpen(false);
-				}
-
+				
+				
+				
 
 
 			}
@@ -163,6 +202,15 @@ public class Game extends JPanel implements ActionListener {
 				int x = pos.x;
 				int y = pos.y;
 
+					
+					if (x<solidarea.x+solidarea.getX()+solidarea.getWidth() && x>solidarea.getX() &&
+							y<solidarea.getHeight()+solidarea.y && y>solidarea.getY()-solidarea.getHeight()){
+						dude.building=true;
+						dude.buildBlock=true;
+
+					}
+
+
 
 			}
 
@@ -170,6 +218,8 @@ public class Game extends JPanel implements ActionListener {
 			public void mouseReleased(MouseEvent e) {
 				int x = e.getX();
 				int y = e.getY();
+
+
 
 
 			}
@@ -190,6 +240,7 @@ public class Game extends JPanel implements ActionListener {
 
 			}
 
+
 		});
 		this.addMouseMotionListener(new MouseMotionListener() {
 
@@ -204,16 +255,61 @@ public class Game extends JPanel implements ActionListener {
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+				MouseX=x;
+				MouseY=y;
 
 			}
 
 		});
 	}
-	private void DrawArea(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		Color c = new Color(255, 0, 171);
-		g2d.setColor(c);
-		g2d.fillRect(dude.getX(), dude.getY(), 10, 10);
+	private void DrawArea(Graphics g,boolean IS_BUILDING) {
+
+		if(IS_BUILDING){
+			Graphics2D g2d = (Graphics2D) g;
+			Color c;
+
+
+
+			switch (BLOCKS[0].BlockAnimPos){
+				case 1:
+					c = new Color(255, 215, 0, 100);
+
+
+					g2d.setColor(c);
+					g2d.fillRect((int) BLOCKS[0].BODY.getX(), (int) BLOCKS[0].BODY.getY(), (int) BLOCKS[0].BODY.getWidth(), (int) BLOCKS[0].BODY.getHeight());
+					break;
+				case 2:
+					c = new Color(255, 215, 0, 150);
+					g2d.setColor(c);
+					g2d.fillRect((int) BLOCKS[0].BODY.getX(), (int) BLOCKS[0].BODY.getY(), (int) BLOCKS[0].BODY.getWidth(), (int) BLOCKS[0].BODY.getHeight());					break;
+				case 3:
+					c = new Color(255, 215, 0, 255);
+					g2d.setColor(c);
+					g2d.fillRect((int) BLOCKS[0].BODY.getX(), (int) BLOCKS[0].BODY.getY(), (int) BLOCKS[0].BODY.getWidth(), (int) BLOCKS[0].BODY.getHeight());
+
+					break;
+				default:
+					c = new Color(255, 215, 0, 0);
+					g2d.setColor(c);
+					g2d.fillRect((int) BLOCKS[0].BODY.getX(), (int) BLOCKS[0].BODY.getY(), (int) BLOCKS[0].BODY.getWidth(), (int) BLOCKS[0].BODY.getHeight());					break;
+
+			}
+		}
+		else{
+			Graphics2D g2d = (Graphics2D) g;
+			Color c = new Color(255, 215, 0);
+
+
+			g2d.setColor(c);
+			g2d.fillRect(600, 861, 70, 70);
+
+		}
+
+
+
+
 
 
 	}
@@ -301,8 +397,18 @@ public class Game extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		dude.move(this.getWidth(), this.getHeight());
-		
+		this.solidarea = new Rectangle(600, 861+70 , 70, 70);
+		if (dude.buildBlock==true && DRAWBLOCK){
+
+			BLOCKS[0].BODY.setLocation(600, 861 );
+
+			BLOCKS[0].BODY.setBounds(600, 861 , 70, 70);
+
+
+		}
+		dude.move(this.getWidth(), this.getHeight(),this.BLOCKS,this.platform,dude.buildBlock);
+
+
 
 
 	}
