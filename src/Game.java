@@ -132,11 +132,10 @@ public class Game extends JPanel implements ActionListener {
 
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.fillRect(0, 931, this.getWidth(), 5);
-        Color c = new Color(255, 0, 34);
 
 
-        g2d.setColor(c);
+
+
 
 
         float XLEN = MouseX - (dude.getX() + (dude.getWidth() / 2));
@@ -190,6 +189,11 @@ public class Game extends JPanel implements ActionListener {
             DrawBase(g);
             if (!dude.Bullets.isEmpty()){
                 for (Bullet X:dude.Bullets){
+                    Color c;
+                    c = new Color(255, 255, 255);
+                    g2d.setColor(c);
+                    g2d.fillRect(0, 931, this.getWidth(), 5);
+
                     g2d.drawOval(X.getX(),X.getY(),10,10);
                     this.repaint();
                 }
