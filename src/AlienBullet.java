@@ -2,7 +2,7 @@ import java.awt.*;
 
 import javax.swing.ImageIcon;
 
-public class Bullet {
+public class AlienBullet {
     double angle;
     int x,y,w,h;
     int dx,dy;
@@ -28,21 +28,21 @@ public class Bullet {
         this.w = w;
     }
 
-    public Bullet(int startX, int startY , int MouseX, int MouseY)
+    public AlienBullet(int startX, int startY , int BaseX, int BaseY)
     {
         x=startX;
         y=startY;
         this.w=10;
         this.h=10;
-        float XLEN = MouseX - startX;
-        float YLEN = MouseY - startY;
+        float XLEN = BaseX - startX;
+        float YLEN = BaseY - startY;
 
         length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
 
         Vx= (XLEN  / length) ;
         Vy= (YLEN / length) ;
 
-        angle = Math.atan2(MouseX - startX, MouseY - startY) + Math.PI;
+        angle = Math.atan2(BaseX - startX, BaseY - startY) + Math.PI;
 
 
 
@@ -80,11 +80,11 @@ public class Bullet {
 
 
 
-    public void move(int width, int height)
+    public void move(int width)
     {
-        x += (int) (Vx*40 );
-        y += (int) (Vy*40  );
-        if (x>width || y>height||x<0||y<0){
+        x += (int) (Vx*30 );
+        y += (int) (Vy*30  );
+        if (y>900 || x>width || x<0){
             visible = false;
 
         }

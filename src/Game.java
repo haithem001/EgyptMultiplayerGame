@@ -3,7 +3,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,8 +23,9 @@ public class Game extends JPanel implements ActionListener {
 
     public int MouseX, MouseY;
     public HUD hud;
-
-
+    private final int i=0;
+    private final int j=this.getHeight()-220;
+    private int clock;
     private Timer timer;
     private Animations anim;
     private int mapAnimPos;
@@ -49,6 +49,7 @@ public class Game extends JPanel implements ActionListener {
 	};*/
     private final int platform = 850;
     private final List<BLOCK> BLOCKS = new ArrayList<>();
+    private final List<ALIEN> ALIENS = new ArrayList<>();
 
 
     public Game() {
@@ -67,28 +68,15 @@ public class Game extends JPanel implements ActionListener {
 
 
     public void initGame() {
-
-
         this.addKeyListener(new TAdapter());
         this.setBackground(Color.black);
         this.setFocusable(true);
 
-
-        hud = new HUD();
-        hud.setX(90);
-        hud.setY(680);
-
-
         dude = new Dude();
-
-
         dude.setX(252);
         dude.setY(platform - dude.getHeight());
-
-
         timer = new Timer(DELAY, this);
         timer.start();
-
         MouseEvents();
     }
 
@@ -143,7 +131,13 @@ public class Game extends JPanel implements ActionListener {
 
         double length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
 
-        dude.BlockAnim();
+
+        /*while (i<this.getWidth()+70){
+            while(j<this.getHeight()+70) {
+                g2d.drawImage(BLOCKS.get(0).getImage(0), i, j, this);
+            }
+
+        }*/
         // board
         if (dude.isWalking() == true) {
 
@@ -153,50 +147,51 @@ public class Game extends JPanel implements ActionListener {
 
         MapAnim();
         DrawPlayer(g);
+        DrawPlayerHealth(g2d);
+        if (!ALIENS.isEmpty()){
+            for (ALIEN alien : ALIENS) {
 
-
+                g2d.drawImage(alien.getImage(), alien.getX(),alien.getY(), this);
+                this.repaint();
+            }
+        }
 
         for (BLOCK B : BLOCKS) {
             /*if (B.isBuilded()) {
-
                 if ((dude.getX() + (dude.getWidth() / 2)) > B.getX() - (4 * (dude.getWidth() / 2)) && ((dude.getX() + (dude.getWidth() / 2) < B.getX() - (dude.getWidth() / 2)))) {
-
-
-
                             g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX()-70, (int) B.getY(), this);
                             g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() , (int) B.getY()-70, this);
-
-
-
-
-
-
-
                 }
                 if ((dude.getX() + (dude.getWidth() / 2) < B.getX() + B.getW() + 2 * (dude.getWidth() / 2)) && ((dude.getX() + (dude.getWidth() / 2) > B.getX() + B.getW()))&&dude.getY()+dude.getHeight()<B.getY()) {
                     g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() + 70, (int) B.getY(), this);
                     g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() , (int) B.getY()-70, this);
-
-
                 }
-
-                g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-
-            }
-
-*/
-            g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
+               g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
+            }*/
+            g2d.drawImage(B.getImage(B.getHealth()), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
             DrawBase(g);
-            if (!dude.Bullets.isEmpty()){
-                for (Bullet X:dude.Bullets){
-                    Color c;
-                    c = new Color(255, 255, 255);
-                    g2d.setColor(c);
-                    g2d.fillRect(0, 931, this.getWidth(), 5);
 
-                    g2d.drawOval(X.getX(),X.getY(),10,10);
+        }
+        for (ALIEN alien : ALIENS) {
+            if (!alien.bullets.isEmpty()){
+                for (AlienBullet X:alien.bullets){
+                    Color c;
+                    c = new Color(255, 85, 60);
+                    g2d.setColor(c);
+                    g2d.fillOval(X.getX(), X.getY(), 10, 10);
+
                     this.repaint();
                 }
+            }
+        }
+        if (!dude.Bullets.isEmpty()){
+            for (Bullet X:dude.Bullets){
+                Color c;
+                c = new Color(255, 255, 255);
+                g2d.setColor(c);
+                g2d.fillOval(X.getX(), X.getY(), 10, 10);
+
+                this.repaint();
             }
         }
         if (dude.isItemchoosen()){
@@ -213,6 +208,7 @@ public class Game extends JPanel implements ActionListener {
             double angle = Math.atan2(YLEN, XLEN) - Math.PI / 2;
             g2d.rotate(angle, dude.BOMBA.getX()+10, dude.BOMBA.getY());
             g2d.drawImage(dude.BOMBA.getImage(), dude.BOMBA.getX(), dude.BOMBA.getY(), this);
+            this.repaint();
 
 
         }
@@ -224,6 +220,16 @@ public class Game extends JPanel implements ActionListener {
         Toolkit.getDefaultToolkit().sync();
 
     }
+
+    private void DrawPlayerHealth(Graphics2D g2d) {
+        int i=50;
+        for (int x = 0; x < dude.getHealth();x++) {
+            g2d.drawImage(dude.getHEART(),  i, this.getHeight()-50, this);
+            i+=50;
+
+        }
+    }
+
     private void Build(int x,int y){
 
             for (BLOCK B : BLOCKS) {
@@ -265,6 +271,14 @@ public class Game extends JPanel implements ActionListener {
 
                 int x = e.getX();
                 int y = e.getY();
+                if(!dude.isItemchoosen()){
+                    if (dude.Bullets.size()<3){
+                        dude.Shoot(MouseX,MouseY);
+
+                    }
+                }
+
+
 
 
 
@@ -276,15 +290,11 @@ public class Game extends JPanel implements ActionListener {
                 int x = pos.x;
                 int y = pos.y;
 
-                dude.BlockAnimPos+=1;
+
                 if(dude.isItemchoosen()){
                     Build(x,y);
                 }
 
-                else{
-
-                    dude.Shoot(MouseX,MouseY);
-                }
 
 
 
@@ -444,24 +454,114 @@ public class Game extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-
         for (BLOCK B : BLOCKS) {
             if (B.isBuilded()) {
                 B.BODY.setLocation(B.getX(), B.getY());
                 B.BODY.setBounds(B.getX(), B.getY(), 70, 70);
             }
         }
-        dude.move(this.getWidth(), this.getHeight(), this.BLOCKS, this.platform);
-        if (!dude.Bullets.isEmpty())
-        {
-            for (Bullet B:dude.Bullets){
-                B.move();
+
+        if (BLOCKS.size()>5){
+            if(ALIENS.isEmpty()){
+
+                ALIENS.add(new ALIEN((int) (Math.random()*getWidth()), -40));
             }
         }
 
 
-    }
+        dude.move(this.getWidth(), this.getHeight(), this.BLOCKS, this.platform);
+        Checkill();
 
+
+
+        if (!dude.Bullets.isEmpty())
+        {
+            for (Bullet B:dude.Bullets){
+                    B.move(getWidth(),getHeight());
+            }
+        }
+        for (ALIEN A : ALIENS) {
+            if (A.getDx()==0){
+                if (A.bullets.isEmpty()){
+                    if (Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())){
+                        A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX(),BLOCKS.get(0).getY());
+
+                    }
+                    else{
+                        A.shoot(A.getX(),A.getY(),dude.getX(),dude.getY());
+                    }
+                }
+            }
+        }
+        for (ALIEN A : ALIENS){
+            if (!A.bullets.isEmpty()){
+                for (AlienBullet B:A.bullets){
+                    B.move(getWidth());
+                }
+            }
+        }
+        CheckDestroy();
+
+
+        if (!ALIENS.isEmpty()){
+            for (ALIEN A:ALIENS){
+                A.move();
+
+            }
+        }
+
+        dude.Bullets.removeIf(B -> !B.getVisible());
+
+
+
+
+        ALIENS.removeIf(A -> !A.isAlive());
+
+
+    }
+    private void Checkill(){
+        if (!ALIENS.isEmpty()&& !dude.Bullets.isEmpty()) {
+            for (ALIEN A:ALIENS){
+                for (Bullet B:dude.Bullets){
+                        if(B.x+B.getW()<A.getX()+A.getW() && B.x>A.getX() && B.y+B.getH()<A.getY()+A.getH() && B.y>A.getY()){
+                            B.setVisible(false);
+                            A.setAlive(false);
+
+                        }
+                    }
+
+                }
+
+        }
+
+    }
+    private void CheckDestroy(){
+        for(ALIEN A:ALIENS) {
+            for (AlienBullet B : A.bullets) {
+                for (BLOCK Block : BLOCKS) {
+                    if (B.x + B.getW() < Block.getX() + Block.getW() && B.x > Block.getX() && B.y + B.getH() < Block.getY() + Block.getH() && B.y > Block.getY()) {
+                            Block.setHealth(Block.getHealth() - 1);
+                            B.setVisible(false);
+
+                    }
+                    if (Block.getHealth()<0){
+                        Block.setVisible(false);
+                    }
+
+
+                }
+                BLOCKS.removeIf(C -> !C.isVisible());
+                if (B.x + B.getW() < dude.getX() + dude.getWidth() && B.x > dude.getX() && B.y + B.getH() < dude.getY() + dude.getHeight() && B.y > dude.getY()) {
+                    dude.setHealth(dude.getHealth()-1);
+                    B.setVisible(false);
+
+                }
+            }
+            A.bullets.removeIf(D -> !D.getVisible());
+
+
+        }
+    }
     public class TAdapter extends KeyAdapter {
 
         @Override

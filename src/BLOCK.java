@@ -7,7 +7,8 @@ public class BLOCK {
     private int y;
     private int w;
     private int h;
-    private boolean visible=false;
+    private int health=2;
+    private boolean visible=true;
     private  boolean base=false;
     private  boolean builded;
     public int BlockAnimCount,BlockAnimPos, BlockAnimDir ;
@@ -32,6 +33,8 @@ public class BLOCK {
         this.Build[0] = empty.getImage();
         if (Base){
             ImageIcon baseimg = new ImageIcon("src/BASE.png");
+            ImageIcon ii1 = new ImageIcon("src/BLOCK1.png");
+            this.BlockImgs[0] = ii1.getImage();
             this.BaseImg[0] = baseimg.getImage();
             this.w = BaseImg[0].getWidth(null);
 
@@ -44,9 +47,9 @@ public class BLOCK {
         }
         else {
 
-            ImageIcon ii1 = new ImageIcon("src/BLOCK1.png");
+            ImageIcon ii1 = new ImageIcon("src/BLOCK3.png");
             ImageIcon ii2 = new ImageIcon("src/BLOCK2.png");
-            ImageIcon ii3 = new ImageIcon("src/BLOCK3.png");
+            ImageIcon ii3 = new ImageIcon("src/BLOCK1.png");
             this.BlockImgs[0] = ii1.getImage();
             this.BlockImgs[1] = ii2.getImage();
             this.BlockImgs[2] = ii3.getImage();
@@ -111,5 +114,21 @@ public class BLOCK {
 
     public void setBuilded(boolean builded) {
         this.builded = builded;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

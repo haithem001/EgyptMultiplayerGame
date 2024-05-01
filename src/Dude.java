@@ -19,10 +19,12 @@ public class Dude {
     private int lastdir;
     private int w;
     private int h;
-    private int health = 3;
+    private int health = 5;
     private boolean walking = true;
     private Image[] WRIGHT = new Image[2];
     private Image[] WLEFT = new Image[2];
+    private Image HEART;
+
     private int Velocity = 10;
     private boolean JUMP = false;
     private int jump_height = 15;
@@ -61,8 +63,8 @@ public class Dude {
         ImageIcon ii2 = new ImageIcon("src/PLAYER1_2.png");
         ImageIcon ii3 = new ImageIcon("src/PLAYER1_1L.png");
         ImageIcon ii4 = new ImageIcon("src/PLAYER1_2L.png");
-
-
+        ImageIcon HEALTHICON = new ImageIcon("src/HEALTH.png");
+        HEART=HEALTHICON.getImage();
 
         this.WRIGHT[0] = ii1.getImage();
         this.WRIGHT[1] = ii2.getImage();
@@ -82,6 +84,15 @@ public class Dude {
     public int getdx() {
 
         return this.dx;
+    }
+    public Image getHEART(){
+        return this.HEART;
+    }
+    public void setHealth(int health){
+        this.health = health;
+    }
+    public int getHealth() {
+        return this.health;
     }
 
     public int getdy() {
