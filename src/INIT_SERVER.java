@@ -28,7 +28,7 @@ public class INIT_SERVER extends JFrame implements ActionListener {
          p.add(l);
          f.add(p);
          f.setSize(300,300);
-         f.show();
+         f.setVisible(true);
 
     }
 
@@ -43,12 +43,13 @@ public class INIT_SERVER extends JFrame implements ActionListener {
         String s = e.getActionCommand();
         if (s.equals("submit")) {
             // set the text of the label to the text of the field
+            f.dispose();
+
             l.setText(t.getText());
             LaunchGame server = new LaunchGame();
             server.setSize(this.getSize());
             server.setVisible(true);
             server.setBackground(Color.black);
-
 
             // set the text of field to blank
             t.setText("  ");
