@@ -112,10 +112,13 @@ public class InitGame extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 
 		if(e.getSource()== CreateRoom) {
-			LaunchGame start=new LaunchGame();
-			start.getSize(this.getSize());
-			start.setBackground(Color.black);
+			INIT_SERVER server= new INIT_SERVER();
+			server.setSize(this.getSize());
+			server.setVisible(true);
+			server.setBackground(Color.black);
+
 			this.dispose();
+
 		}
 
 	}

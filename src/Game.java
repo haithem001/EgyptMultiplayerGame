@@ -481,7 +481,7 @@ public class Game extends JPanel implements ActionListener {
             }
         }
         for (ALIEN A : ALIENS) {
-            if (A.getDx()==0){
+            if (A.getDy()==0){
                 if (A.bullets.isEmpty()){
                     if (Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())){
                         A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX(),BLOCKS.get(0).getY());

@@ -39,7 +39,7 @@ public class ALIEN {
 
 
     }
-    public int getDx() {
+    public int getDy() {
         return dy;
     }
     public Image getImage() {
