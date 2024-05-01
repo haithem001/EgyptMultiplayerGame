@@ -1,58 +1,42 @@
 import javax.swing.*;
 
+import java.awt.*;
 import java.awt.event.*;
 public class INIT_SERVER extends JFrame implements ActionListener {
     // JTextField
     static JTextField t;
 
     // JFrame
-    static JFrame f;
+    static JFrame f = new JFrame("textfield");
 
     // JButton
-    static JButton b;
+    static JButton b= new JButton("submit");
 
     // label to display text
-    static JLabel l;
+    static JLabel l= new JLabel("nothing entered");
 
     // default constructor
      INIT_SERVER() {
+     }
+    public static void text(){
+         INIT_SERVER te = new INIT_SERVER();
+         b.addActionListener(te);
+         t= new JTextField(16);
+         JPanel p = new JPanel();
+         p.add(t);
+         p.add(b);
+         p.add(l);
+         f.add(p);
+         f.setSize(300,300);
+         f.show();
+
+    }
 
 
          // main class
 
          // create a new frame to store text field and button
-         f = new JFrame("textfield");
 
-         // create a label to display text
-         l = new JLabel("nothing entered");
-
-         // create a new button
-         b = new JButton("submit");
-
-         // create a object of the text class
-
-
-         // addActionListener to button
-
-         // create a object of JTextField with 16 columns and a given initial text
-         t = new JTextField("enter the text", 16);
-
-         // create a panel to add buttons and textfield
-         JPanel p = new JPanel();
-
-         // add buttons and textfield to panel
-         p.add(t);
-         p.add(b);
-         p.add(l);
-
-         // add panel to frame
-         f.add(p);
-
-         // set the size of frame
-         f.setSize(300, 300);
-         this.add(f);
-
-     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -60,11 +44,19 @@ public class INIT_SERVER extends JFrame implements ActionListener {
         if (s.equals("submit")) {
             // set the text of the label to the text of the field
             l.setText(t.getText());
+            LaunchGame server = new LaunchGame();
+            server.setSize(this.getSize());
+            server.setVisible(true);
+            server.setBackground(Color.black);
+
 
             // set the text of field to blank
             t.setText("  ");
         }
     }
 }
+
+
+
 
 
