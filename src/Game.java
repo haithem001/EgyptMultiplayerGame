@@ -174,21 +174,6 @@ public class Game extends JPanel implements ActionListener{
 
 
 
-    private void MapAnim() {
-
-        mapAnimCount--;
-
-        if (mapAnimCount <= 0) {
-
-            mapAnimCount = MAP_ANIM_DELAY;
-            mapAnimPos = mapAnimPos + mapAnimDir;
-
-            if (mapAnimPos == (MAP_ANIM_COUNT - 1) || mapAnimPos == 0) {
-                mapAnimDir = -mapAnimDir;
-            }
-        }
-
-    }
 
 
 
@@ -318,82 +303,16 @@ public class Game extends JPanel implements ActionListener{
         g2d.drawImage(BLOCKS.get(0).getBaseImage(), (int) BLOCKS.get(0).BODY.getX(), (int) BLOCKS.get(0).BODY.getY(), this);
     }
 
-    private void DrawBlock(Graphics g, BLOCK B) {
-        Graphics2D g2d = (Graphics2D) g;
-        Color c;
-        g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-		/*if(B.isBuilded()==false){
 
 
 
 
-			switch (B.BlockAnimPos){
-				case 1:
-					g2d.drawImage(B.getImage(2), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-
-					break;
-				case 2:
-					g2d.drawImage(B.getImage(1), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-					break;
-				case 3:
-					g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-
-
-					break;
-				default:
-					g2d.drawImage(B.getImage(2), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-					break;
-
-			}
-		}
-		else{
-
-		}
-
-*/
-
-
-    }
-
-
-    private void DrawHUD(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-
-        // HUD placement
-        g2d.setFont(new Font("PixellettersFull", Font.BOLD, 30));
-        g2d.setColor(new Color(132, 117, 119));
-        g2d.drawImage(hud.getImage(), hud.getX(), hud.getY(), this);
-        for (int i = 1; i <= dude.gethealth(); i++) {
-            g2d.drawImage(hud.getHeartImage(), hud.getX() + i * 25, hud.getY() + 20, this);
-
-        }
-        g2d.drawImage(hud.getItemsImage(), hud.getX() + 140, hud.getY() + 16, this);
-
-        // COINS ANIM
-        switch (mapAnimPos) {
-
-            case 0:
-                g2d.drawImage(hud.getCoinImage(0), hud.getX() + 25, hud.getY() + 50, this);
-                break;
-            case 1:
-                g2d.drawImage(hud.getCoinImage(1), hud.getX() + 25, hud.getY() + 50, this);
-                break;
-
-        }
-
-
-        g2d.drawString(hud.getCoins(), hud.getX() + 55, hud.getY() + 67);
-        g2d.drawString(":", hud.getX() + 43, hud.getY() + 65);
-
-        // Bag and Inventory
-
-
-    }
 
 
     private void DrawPlayer(int playerID, Graphics g) {
 
         Graphics2D playerG = (Graphics2D) g;
+
         playerG.drawImage(dude1.getImage(dude1.getDudeAnimPos()), dude1.getX(), dude1.getY(), this);
         playerG.drawImage(dude.getImage(dude.getDudeAnimPos()), dude.getX(), dude.getY(), this);
 
@@ -461,7 +380,7 @@ public class Game extends JPanel implements ActionListener{
         }
 
         dude.move(getWidth(), getHeight(), BLOCKS, platform);
-        dude1.move(getWidth(), getHeight(), BLOCKS, platform);
+
 
 
 
@@ -639,13 +558,10 @@ public class Game extends JPanel implements ActionListener{
 
         }*/
             // board
-            if (dude.isWalking()) {
 
                 dude.doAnim();
-            }
-            if(dude1.isWalking()){
                 dude1.doAnim();
-            }
+
 
 
 
