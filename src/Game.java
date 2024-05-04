@@ -1,33 +1,26 @@
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import java.util.Objects;
+import java.util.Scanner;
+import javax.swing.*;
 
-public class Game extends JPanel implements ActionListener {
 
+public class Game extends JPanel implements ActionListener{
+    public Dude dude1;
     public Dude dude;
-
+    public int playerID;
+    private Socket socket;
+    private ReadFromServer rfsRunnable;
+    private WriteToServer wsRunnable;
+    private Container contentPane;
 
     public int MouseX, MouseY;
     public HUD hud;
-    private final int i=0;
-    private final int j=this.getHeight()-220;
-    private int clock;
     private Timer timer;
-    private Animations anim;
     private int mapAnimPos;
     private int mapAnimCount;
     private int MAP_ANIM_DELAY;
@@ -38,63 +31,147 @@ public class Game extends JPanel implements ActionListener {
     private int dudeAnimCount = DUDE_ANIM_DELAY;
     private int dudeAnimDir = 1;
     private int dudeAnimPos = 0;
+    private int dudeAnimCount1 = DUDE_ANIM_DELAY;
 
-	/*private BLOCK[] BLOCKS = new BLOCK[]{
+    private int dudeAnimDir1 = 1;
+    private int dudeAnimPos1 = 0;
 
-			new BLOCK(670, 861 ,false,false),
-			new BLOCK(530, 861 ,false,false),
-			new BLOCK(460, 861 ,false,false),
-			new BLOCK(390, 861 ,false,false),
 
-	};*/
+
     private final int platform = 850;
     private final List<BLOCK> BLOCKS = new ArrayList<>();
     private final List<ALIEN> ALIENS = new ArrayList<>();
 
 
     public Game() {
+
         BLOCKS.add(new BLOCK(600, 861, true, true));
         //!BASE BLOCK[0]
         BLOCKS.get(0).BODY.setLocation(600, 861);
         BLOCKS.get(0).BODY.setBounds(600, 861, 70, 70);
         initGame();
-        initMap();
+
 
 
     }
 
-    private void initMap() {
-    }
+
 
 
     public void initGame() {
-        this.addKeyListener(new TAdapter());
-        this.setBackground(Color.black);
+
+
+        connectToServer();
+        createSprites();
+
         this.setFocusable(true);
 
-        dude = new Dude();
-        dude.setX(252);
-        dude.setY(platform - dude.getHeight());
+        setBackground(Color.black);
+
+
+        setUpKeyListener();
+
+
+
+
+
+        MouseEvents();
         timer = new Timer(DELAY, this);
         timer.start();
-        MouseEvents();
     }
 
-    private void doAnim(int AnimCount) {
 
-        dudeAnimCount--;
+    private void setUpKeyListener() {
+        KeyListener kl = new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
 
-        if (dudeAnimCount <= 0) {
-
-            dudeAnimCount = DUDE_ANIM_DELAY;
-            dudeAnimPos = dudeAnimPos + dudeAnimDir;
-
-            if (dudeAnimPos == (AnimCount - 1) || dudeAnimPos == 0) {
-                dudeAnimDir = -dudeAnimDir;
             }
-        }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                int key = e.getKeyCode();
+                if (key == KeyEvent.VK_F) {
+
+                    dude.setchoosiness(!dude.getchoosiness());
+
+                }
+                if (key == KeyEvent.VK_Q) {
+
+                    dude.setDx(-10);
+
+                }
+
+                if (key == KeyEvent.VK_D) {
+
+                    dude.setDx(10);
+                }
+                if (key == KeyEvent.VK_SPACE) {
+                    if(dude.on_ground){
+                        dude.JUMP = true;
+
+                    }
+
+
+                }
+
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                int key = e.getKeyCode();
+
+                if (key == KeyEvent.VK_Q) {
+                    dude.setDx(0);
+                    dude.setStopWalk(true);
+                }
+                if (key == KeyEvent.VK_SPACE) {
+
+
+                }
+                if (key == KeyEvent.VK_D) {
+                    dude.setDx(0);
+                    dude.setStopWalk(true);
+                }
+
+
+            }
+
+
+        };
+        this.addKeyListener(kl);
+    }
+
+
+
+    private void createSprites(){
+            if (playerID==1){
+                dude = new Dude();
+                dude.setX(200);
+                dude.setY(750);
+                dude1 = new Dude();
+                dude1.setX(400);
+                dude1.setY(750);
+
+            }
+            else {
+                dude = new Dude();
+                dude.setX(400);
+                dude.setY(750);
+                dude1 = new Dude();
+                dude1.setX(200);
+                dude1.setY(750);
+            }
+
+
+
+
 
     }
+
+
 
 
     private void MapAnim() {
@@ -113,113 +190,7 @@ public class Game extends JPanel implements ActionListener {
 
     }
 
-    @Override
-    public void paintComponent(Graphics g) {
 
-        //System.out.println(BLOCKS.size());
-
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-
-
-
-
-
-
-        float XLEN = MouseX - (dude.getX() + (dude.getWidth() / 2));
-        float YLEN = MouseY - (dude.getY() + (dude.getHeight() / 2));
-
-        double length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
-
-
-        /*while (i<this.getWidth()+70){
-            while(j<this.getHeight()+70) {
-                g2d.drawImage(BLOCKS.get(0).getImage(0), i, j, this);
-            }
-
-        }*/
-        // board
-        if (dude.isWalking() == true) {
-
-            doAnim(2);
-        }
-
-
-        MapAnim();
-        DrawPlayer(g);
-        DrawPlayerHealth(g2d);
-        if (!ALIENS.isEmpty()){
-            for (ALIEN alien : ALIENS) {
-
-                g2d.drawImage(alien.getImage(), alien.getX(),alien.getY(), this);
-                this.repaint();
-            }
-        }
-
-        for (BLOCK B : BLOCKS) {
-            /*if (B.isBuilded()) {
-                if ((dude.getX() + (dude.getWidth() / 2)) > B.getX() - (4 * (dude.getWidth() / 2)) && ((dude.getX() + (dude.getWidth() / 2) < B.getX() - (dude.getWidth() / 2)))) {
-                            g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX()-70, (int) B.getY(), this);
-                            g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() , (int) B.getY()-70, this);
-                }
-                if ((dude.getX() + (dude.getWidth() / 2) < B.getX() + B.getW() + 2 * (dude.getWidth() / 2)) && ((dude.getX() + (dude.getWidth() / 2) > B.getX() + B.getW()))&&dude.getY()+dude.getHeight()<B.getY()) {
-                    g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() + 70, (int) B.getY(), this);
-                    g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() , (int) B.getY()-70, this);
-                }
-               g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-            }*/
-            g2d.drawImage(B.getImage(B.getHealth()), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
-            DrawBase(g);
-
-        }
-        for (ALIEN alien : ALIENS) {
-            if (!alien.bullets.isEmpty()){
-                for (AlienBullet X:alien.bullets){
-                    Color c;
-                    c = new Color(255, 85, 60);
-                    g2d.setColor(c);
-                    g2d.fillOval(X.getX(), X.getY(), 10, 10);
-
-                    this.repaint();
-                }
-            }
-        }
-        if (!dude.Bullets.isEmpty()){
-            for (Bullet X:dude.Bullets){
-                Color c;
-                c = new Color(255, 255, 255);
-                g2d.setColor(c);
-                g2d.fillOval(X.getX(), X.getY(), 10, 10);
-
-                this.repaint();
-            }
-        }
-        if (dude.isItemchoosen()){
-            dude.Axe.setX((int) (((dude.getX() + dude.getWidth() / 2) + XLEN * 40 / length) ));
-            dude.Axe.setY((int) ((dude.getY() + dude.getHeight() / 2) + YLEN * 40 / length) );
-            double angle = Math.atan2(YLEN, XLEN) - Math.PI / 2;
-            g2d.rotate(angle, dude.Axe.getX()+10, dude.Axe.getY());
-            g2d.drawImage(dude.Axe.getImage(), dude.Axe.getX(), dude.Axe.getY(), this);
-            this.repaint();
-        }
-        else{
-            dude.BOMBA.setX((int) (((dude.getX() + dude.getWidth() / 2) + XLEN * 40 / length) ));
-            dude.BOMBA.setY((int) ((dude.getY() + dude.getHeight() / 2) + YLEN * 40 / length) );
-            double angle = Math.atan2(YLEN, XLEN) - Math.PI / 2;
-            g2d.rotate(angle, dude.BOMBA.getX()+10, dude.BOMBA.getY());
-            g2d.drawImage(dude.BOMBA.getImage(), dude.BOMBA.getX(), dude.BOMBA.getY(), this);
-            this.repaint();
-
-
-        }
-
-
-
-        this.repaint();
-
-        Toolkit.getDefaultToolkit().sync();
-
-    }
 
     private void DrawPlayerHealth(Graphics2D g2d) {
         int i=50;
@@ -271,7 +242,7 @@ public class Game extends JPanel implements ActionListener {
 
                 int x = e.getX();
                 int y = e.getY();
-                if(!dude.isItemchoosen()){
+                if(!dude.isChoosiness()){
                     if (dude.Bullets.size()<3){
                         dude.Shoot(MouseX,MouseY);
 
@@ -291,7 +262,7 @@ public class Game extends JPanel implements ActionListener {
                 int y = pos.y;
 
 
-                if(dude.isItemchoosen()){
+                if(dude.isChoosiness()){
                     Build(x,y);
                 }
 
@@ -316,10 +287,7 @@ public class Game extends JPanel implements ActionListener {
             public void mouseExited(MouseEvent e) {
                 int x = e.getX();
                 int y = e.getY();
-                if (hud.getX() + hud.getW() - 15 >= x && x >= hud.getX() + hud.getW() - 75 && y >= hud.getY() + 11
-                        && y <= hud.getY() + 81) {
-                    hud.SetInventoryOpen(false);
-                }
+                
 
             }
 
@@ -422,103 +390,15 @@ public class Game extends JPanel implements ActionListener {
     }
 
 
-    private void DrawPlayer(Graphics g) {
+    private void DrawPlayer(int playerID, Graphics g) {
 
         Graphics2D playerG = (Graphics2D) g;
-
-        if (dude.isWalking()) {
-            switch (dudeAnimPos) {
-                case 0:
-                    if (dude.getdx() > 0) {
-                        playerG.drawImage(dude.getImage(0), dude.getX(), dude.getY(), this);
-                        break;
-                    } else {
-
-                        playerG.drawImage(dude.getImage(0), dude.getX(), dude.getY(), this);
-                        break;
-                    }
-
-                case 1:
-                    playerG.drawImage(dude.getImage(1), dude.getX(), dude.getY(), this);
-                    break;
-
-                default:
-                    playerG.drawImage(dude.getImage(1), dude.getX(), dude.getY(), this);
-            }
-
-        }
-
-    }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        for (BLOCK B : BLOCKS) {
-            if (B.isBuilded()) {
-                B.BODY.setLocation(B.getX(), B.getY());
-                B.BODY.setBounds(B.getX(), B.getY(), 70, 70);
-            }
-        }
-
-        if (BLOCKS.size()>5){
-            if(ALIENS.isEmpty()){
-
-                ALIENS.add(new ALIEN((int) (Math.random()*getWidth()), -40));
-            }
-        }
-
-
-        dude.move(this.getWidth(), this.getHeight(), this.BLOCKS, this.platform);
-        Checkill();
-
-
-
-        if (!dude.Bullets.isEmpty())
-        {
-            for (Bullet B:dude.Bullets){
-                    B.move(getWidth(),getHeight());
-            }
-        }
-        for (ALIEN A : ALIENS) {
-            if (A.getDy()==0){
-                if (A.bullets.isEmpty()){
-                    if (Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())){
-                        A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX(),BLOCKS.get(0).getY());
-
-                    }
-                    else{
-                        A.shoot(A.getX(),A.getY(),dude.getX(),dude.getY());
-                    }
-                }
-            }
-        }
-        for (ALIEN A : ALIENS){
-            if (!A.bullets.isEmpty()){
-                for (AlienBullet B:A.bullets){
-                    B.move(getWidth());
-                }
-            }
-        }
-        CheckDestroy();
-
-
-        if (!ALIENS.isEmpty()){
-            for (ALIEN A:ALIENS){
-                A.move();
-
-            }
-        }
-
-        dude.Bullets.removeIf(B -> !B.getVisible());
-
-
-
-
-        ALIENS.removeIf(A -> !A.isAlive());
+        playerG.drawImage(dude1.getImage(dude1.getDudeAnimPos()), dude1.getX(), dude1.getY(), this);
+        playerG.drawImage(dude.getImage(dude.getDudeAnimPos()), dude.getX(), dude.getY(), this);
 
 
     }
+
     private void Checkill(){
         if (!ALIENS.isEmpty()&& !dude.Bullets.isEmpty()) {
             for (ALIEN A:ALIENS){
@@ -562,18 +442,338 @@ public class Game extends JPanel implements ActionListener {
 
         }
     }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        for (BLOCK B : BLOCKS) {
+            if (B.isBuilded()) {
+                B.BODY.setLocation(B.getX(), B.getY());
+                B.BODY.setBounds(B.getX(), B.getY(), 70, 70);
+            }
+        }
+
+        if (BLOCKS.size()>5){
+            if(ALIENS.isEmpty()){
+
+                ALIENS.add(new ALIEN((int) (Math.random()*getWidth()), -40));
+            }
+        }
+
+        dude.move(getWidth(), getHeight(), BLOCKS, platform);
+        dude1.move(getWidth(), getHeight(), BLOCKS, platform);
+
+
+
+        Checkill();
+
+
+
+        if (!dude.Bullets.isEmpty())
+        {
+            for (Bullet B:dude.Bullets){
+                B.move(getWidth(),getHeight());
+            }
+        }
+        for (ALIEN A : ALIENS) {
+            if (A.getDy()==0){
+                if (A.bullets.isEmpty()){
+                    if (Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())){
+                        A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX(),BLOCKS.get(0).getY());
+
+                    }
+                    else{
+                        A.shoot(A.getX(),A.getY(),dude.getX(),dude.getY());
+                    }
+                }
+            }
+        }
+        for (ALIEN A : ALIENS){
+            if (!A.bullets.isEmpty()){
+                for (AlienBullet B:A.bullets){
+                    B.move(getWidth());
+                }
+            }
+        }
+        CheckDestroy();
+
+
+        if (!ALIENS.isEmpty()){
+            for (ALIEN A:ALIENS){
+                A.move();
+
+            }
+        }
+
+        dude.Bullets.removeIf(B -> !B.getVisible());
+
+
+
+
+        ALIENS.removeIf(A -> !A.isAlive());
+
+
+
+    }
+
+    private class ReadFromServer implements Runnable{
+        private DataInputStream in;
+        public ReadFromServer(DataInputStream in){
+            this.in = in;
+            System.out.println("Reading from server Runnable created");
+        }
+        public void run(){
+            try {
+                while (true){
+                    if(dude1 != null) {
+
+                        dude1.setX(in.readInt());
+                        dude1.setY(in.readInt());
+
+
+
+                    }
+                    try {
+                        Thread.sleep(25);
+                    }catch (InterruptedException ex){
+                        System.out.println("InterruptedException in WriteToServer");
+                    }
+
+
+                }
+            }catch (IOException e){
+                System.out.println("IOException in ReadFromServer");
+            }
+
+        }
+        public void waitForStartMsg(){
+            try {
+                String startMsg = in.readUTF();
+                System.out.println("Message from server : "+startMsg);
+                Thread readThread = new Thread(rfsRunnable);
+                Thread writeThread = new Thread(wsRunnable);
+
+                readThread.start();
+                writeThread.start();
+            }catch (IOException e){
+                System.out.println("IOException in ReadFromServer");
+            }
+        }
+    }
+
+    private class WriteToServer implements Runnable{
+        private DataOutputStream out;
+        public WriteToServer(DataOutputStream out){
+            this.out = out;
+            System.out.println("Writing to server Runnable created");
+        }
+        public void run(){
+            try {
+                while(true){
+                    if (dude != null) {
+                        out.writeInt(dude.getX());
+                        out.writeInt(dude.getY());
+
+                        out.flush();
+                    }
+                    try {
+                        Thread.sleep(25);
+                    }catch (InterruptedException ex){
+                        System.out.println("InterruptedException in WriteToServer");
+                    }
+                }
+            }catch (IOException e){
+                System.out.println("IOException in WriteToServer");
+            }
+        }
+    }
+
+    private void connectToServer(){
+        try{
+            socket = new Socket("localhost",45371);
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+
+            playerID = in.readInt();
+            System.out.println("You are player#"+playerID);
+            System.out.println(socket.getInetAddress().getHostAddress());
+            if(playerID ==1){
+                System.out.println("Waiting for player #2 to connects...");
+            }
+            rfsRunnable = new ReadFromServer(in);
+
+
+            wsRunnable = new WriteToServer(out);
+
+            rfsRunnable.waitForStartMsg();
+        }catch (IOException ex){
+            System.out.println("IOException from connectToServer()");
+        }
+    }
+
+        public void paintComponent(Graphics g){
+
+            //System.out.println(BLOCKS.size());
+            super.paintComponent(g);
+
+            Graphics2D g2d = (Graphics2D) g;
+
+
+
+
+
+
+            float XLEN = MouseX - (dude.getX() + (dude.getWidth() / 2));
+            float YLEN = MouseY - (dude.getY() + (dude.getHeight() / 2));
+
+
+            double length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
+
+
+        /*while (i<this.getWidth()+70){
+            while(j<this.getHeight()+70) {
+                g2d.drawImage(BLOCKS.get(0).getImage(0), i, j, this);
+            }
+
+        }*/
+            // board
+            if (dude.isWalking() == true) {
+
+                dude.doAnim();
+            }
+
+
+
+            MapAnim();
+            DrawPlayer(1,g);
+            DrawPlayer(2,g);
+
+            DrawPlayerHealth(g2d);
+            if (!ALIENS.isEmpty()){
+                for (ALIEN alien : ALIENS) {
+
+                    g2d.drawImage(alien.getImage(), alien.getX(),alien.getY(), this);
+
+                }
+            }
+
+            for (BLOCK B : BLOCKS) {
+            /*if (B.isBuilded()) {
+                if ((dude.getX() + (dude.getWidth() / 2)) > B.getX() - (4 * (dude.getWidth() / 2)) && ((dude.getX() + (dude.getWidth() / 2) < B.getX() - (dude.getWidth() / 2)))) {
+                            g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX()-70, (int) B.getY(), this);
+                            g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() , (int) B.getY()-70, this);
+                }
+                if ((dude.getX() + (dude.getWidth() / 2) < B.getX() + B.getW() + 2 * (dude.getWidth() / 2)) && ((dude.getX() + (dude.getWidth() / 2) > B.getX() + B.getW()))&&dude.getY()+dude.getHeight()<B.getY()) {
+                    g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() + 70, (int) B.getY(), this);
+                    g2d.drawImage(B.getEmptyBlockImg(), (int) B.getX() , (int) B.getY()-70, this);
+                }
+               g2d.drawImage(B.getImage(0), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
+            }*/
+                g2d.drawImage(B.getImage(B.getHealth()), (int) B.BODY.getX(), (int) B.BODY.getY(), this);
+                DrawBase(g);
+
+            }
+            for (ALIEN alien : ALIENS) {
+                if (!alien.bullets.isEmpty()){
+                    for (AlienBullet X:alien.bullets){
+                        Color c;
+                        c = new Color(255, 85, 60);
+                        g2d.setColor(c);
+                        g2d.fillOval(X.getX(), X.getY(), 10, 10);
+
+                    }
+                }
+            }
+            if (!dude.Bullets.isEmpty()){
+                for (Bullet X:dude.Bullets) {
+                    Color c;
+                    c = new Color(255, 255, 255);
+                    g2d.setColor(c);
+                    g2d.fillOval(X.getX(), X.getY(), 10, 10);
+
+                }
+            }
+            if (dude.isChoosiness()){
+                dude.Axe.setX((int) (((dude.getX() + dude.getWidth() / 2) + XLEN * 40 / length) ));
+                dude.Axe.setY((int) ((dude.getY() + dude.getHeight() / 2) + YLEN * 40 / length) );
+                double angle = Math.atan2(YLEN, XLEN) - Math.PI / 2;
+                g2d.rotate(angle, dude.Axe.getX()+10, dude.Axe.getY());
+                g2d.drawImage(dude.Axe.getImage(), dude.Axe.getX(), dude.Axe.getY(), this);
+            }
+            else{
+                dude.BOMBA.setX((int) (((dude.getX() + dude.getWidth() / 2) + XLEN * 40 / length) ));
+                dude.BOMBA.setY((int) ((dude.getY() + dude.getHeight() / 2) + YLEN * 40 / length) );
+                double angle = Math.atan2(YLEN, XLEN) - Math.PI / 2;
+                g2d.rotate(angle, dude.BOMBA.getX()+10, dude.BOMBA.getY());
+                g2d.drawImage(dude.BOMBA.getImage(), dude.BOMBA.getX(), dude.BOMBA.getY(), this);
+
+
+
+            }
+
+
+
+            this.repaint();
+
+
+            Toolkit.getDefaultToolkit().sync();
+        }
+
     public class TAdapter extends KeyAdapter {
 
         @Override
-        public void keyReleased(KeyEvent e) {
-            dude.keyReleased(e);
+        public void keyPressed(KeyEvent e) {
+
+            int key = e.getKeyCode();
+            if (key == KeyEvent.VK_F) {
+
+                dude.setchoosiness(!dude.getchoosiness());
+
+            }
+            if (key == KeyEvent.VK_Q) {
+
+                dude.setDx(-10);
+
+            }
+
+            if (key == KeyEvent.VK_D) {
+
+                dude.setDx(10);
+            }
+            if (key == KeyEvent.VK_SPACE) {
+                if(dude.on_ground){
+                    dude.JUMP = true;
+
+                }
+
+
+            }
+
+
         }
 
         @Override
-        public void keyPressed(KeyEvent e) {
-            dude.keyPressed(e);
+        public void keyReleased(KeyEvent e) {
+            int key = e.getKeyCode();
+
+            if (key == KeyEvent.VK_Q) {
+                dude.setDx(0);
+                dude.setStopWalk(true);
+            }
+            if (key == KeyEvent.VK_SPACE) {
+
+
+            }
+            if (key == KeyEvent.VK_D) {
+                dude.setDx(0);
+                dude.setStopWalk(true);
+            }
+
+
         }
 
+
     }
+
 
 }

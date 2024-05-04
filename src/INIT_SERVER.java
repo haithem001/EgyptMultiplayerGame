@@ -60,7 +60,8 @@ public class INIT_SERVER extends JFrame implements ActionListener {
             server.setSize(this.getSize());
             server.setVisible(true);
             server.setBackground(Color.black);
-
+            //GameServer gs = new GameServer();
+            //gs.acceptConnection();
             // set the text of field to blank
             IP.setText("  ");
         }

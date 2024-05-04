@@ -13,7 +13,7 @@ public class Fight1 extends Game {
 	}
 	public void initFight(){
 	
-		addKeyListener(new TAdapter());
+
 		setBackground(Color.black);
 		setFocusable(true);
 

@@ -1,9 +1,4 @@
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +6,18 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 public class Dude {
+    public final int BLOCK_ANIM_DELAY;
     public int x;
     public int y;
+    public boolean JUMP = false;
+    public boolean on_ground = true;
+    public PickAxe Axe;
+    public Gun BOMBA;
+    public List<Bullet> Bullets = new ArrayList<>();
+    public int BlockAnimCount, BlockAnimPos = 0, BlockAnimDir = 1;
+    private int DELAY = 60;
+    private final int DUDE_ANIM_DELAY = DELAY * 15;
+    private int dudeAnimCount = DUDE_ANIM_DELAY;
     private int dx;
     private int dy;
     private boolean stopwalk;
@@ -24,39 +29,60 @@ public class Dude {
     private Image[] WRIGHT = new Image[2];
     private Image[] WLEFT = new Image[2];
     private Image HEART;
-
+    private int dudeAnimDir = 1;
+    private int dudeAnimPos = 0;
     private int Velocity = 10;
-    private boolean JUMP = false;
     private int jump_height = 15;
-    private boolean on_ground = true;
-    public PickAxe Axe;
-    public Gun BOMBA;
-    public List<Bullet> Bullets = new ArrayList<>();
-    private boolean Itemchoosen;
-    public int BlockAnimCount,BlockAnimPos=0, BlockAnimDir ;
-    public final int  BLOCK_ANIM_DELAY;
-    public Dude() {
-        BLOCK_ANIM_DELAY = 60 *15;
+    private int AnimCount=2;
+    private boolean Choosiness;
 
-        BlockAnimCount =BLOCK_ANIM_DELAY ;
-        BlockAnimPos=0;
-        BlockAnimDir= 1;
+    public Dude() {
+        BLOCK_ANIM_DELAY = 60 * 15;
+
+        BlockAnimCount = BLOCK_ANIM_DELAY;
+
+        BlockAnimDir = 1;
         loadPlayerIms();
 
     }
-    public boolean isItemchoosen() {
-        return Itemchoosen;
+
+    public int getDx() {
+        return dx;
     }
 
-    public void setItemchoosen(boolean itemchoosen) {
-        Itemchoosen = itemchoosen;
+    public void setDx(int dx) {
+        this.dx = dx;
     }
-    public void Shoot(int MouseX, int MouseY){
-            Bullets.add(new Bullet(BOMBA.getX(),BOMBA.getY(),MouseX,MouseY));
-        System.out.println(Bullets.size());
+
+    public int getDy() {
+        return dy;
     }
+
+    public void setDy(int dy) {
+        this.dy = dy;
+    }
+
+    public int getDudeAnimPos() {
+        return dudeAnimPos;
+    }
+
+    public void setDudeAnimPos(int dudeAnimPos) {
+        this.dudeAnimPos = dudeAnimPos;
+    }
+
+    public boolean isChoosiness() {
+        return Choosiness;
+    }
+
+    public void setChoosiness(boolean choosiness) {
+        Choosiness = choosiness;
+    }
+
+    public void Shoot(int MouseX, int MouseY) {
+        Bullets.add(new Bullet(BOMBA.getX(), BOMBA.getY(), MouseX, MouseY));
+    }
+
     private void loadPlayerIms() {
-
 
 
         ImageIcon ii1 = new ImageIcon("src/PLAYER1_1.png");
@@ -64,7 +90,7 @@ public class Dude {
         ImageIcon ii3 = new ImageIcon("src/PLAYER1_1L.png");
         ImageIcon ii4 = new ImageIcon("src/PLAYER1_2L.png");
         ImageIcon HEALTHICON = new ImageIcon("src/HEALTH.png");
-        HEART=HEALTHICON.getImage();
+        HEART = HEALTHICON.getImage();
 
         this.WRIGHT[0] = ii1.getImage();
         this.WRIGHT[1] = ii2.getImage();
@@ -72,12 +98,52 @@ public class Dude {
         this.WLEFT[1] = ii4.getImage();
 
 
-
-
         w = WRIGHT[0].getWidth(null);
         h = WRIGHT[0].getHeight(null);
-        Axe=new PickAxe(0,0);
-        BOMBA=new Gun(0,0);
+        Axe = new PickAxe(0, 0);
+        BOMBA = new Gun(0, 0);
+
+    }
+
+    public int getDELAY() {
+        return DELAY;
+    }
+
+    public void setDELAY(int DELAY) {
+        this.DELAY = DELAY;
+    }
+
+    public int getDudeAnimCount() {
+        return dudeAnimCount;
+    }
+
+    public void setDudeAnimCount(int dudeAnimCount) {
+        this.dudeAnimCount = dudeAnimCount;
+    }
+
+    public int getDudeAnimDir() {
+        return dudeAnimDir;
+    }
+
+    public void setDudeAnimDir(int dudeAnimDir) {
+        this.dudeAnimDir = dudeAnimDir;
+    }
+
+    public void doAnim() {
+        {
+            dudeAnimCount--;
+
+            if (dudeAnimCount <= 0) {
+
+                dudeAnimCount = DUDE_ANIM_DELAY;
+                dudeAnimPos = dudeAnimPos + dudeAnimDir;
+
+                if (dudeAnimPos == (AnimCount - 1) || dudeAnimPos == 0) {
+                    dudeAnimDir = -dudeAnimDir;
+                }
+            }
+        }
+
 
     }
 
@@ -85,19 +151,30 @@ public class Dude {
 
         return this.dx;
     }
-    public Image getHEART(){
+
+    public Image getHEART() {
         return this.HEART;
     }
-    public void setHealth(int health){
-        this.health = health;
-    }
+
     public int getHealth() {
         return this.health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
     }
 
     public int getdy() {
 
         return this.dy;
+    }
+
+    public void setchoosiness(boolean choosiness) {
+        this.Choosiness = choosiness;
+    }
+
+    public boolean getchoosiness() {
+        return this.Choosiness;
     }
 
     public int gethealth() {
@@ -135,18 +212,14 @@ public class Dude {
     }
 
 
-
-
-
+    public void setWalking(boolean walking) {
+        this.walking = walking;
+    }
 
     public boolean isWalking() {
 
         return walking;
     }
-
-
-
-
 
 
     public Image getImage(int p) {
@@ -191,7 +264,6 @@ public class Dude {
     }
 
     public void move(int W, int H, List<BLOCK> BLOCKS, int platform) {
-        System.out.printf("(%d,%d)\n)", this.x, this.y);
 
 
         this.x = this.x + dx;
@@ -200,125 +272,48 @@ public class Dude {
 
             y += this.Velocity;
 
+        } else {
+            on_ground = true;
         }
-		else{
-			on_ground=true;
-		}
 
-        if (this.JUMP ) {
-			this.on_ground=false;
+        if (this.JUMP) {
+            this.on_ground = false;
             this.JUMP = false;
 
             this.Velocity = -this.jump_height;
             this.y += Velocity;
-            System.out.println(this.Velocity);
 
 
         }
 
 
-            for (BLOCK B:BLOCKS ){
-                if (B.isBuilded()){
-                    if (this.x + this.getWidth() >= B.getX() && this.x <= B.getX() + B.getW()) {
-                        if (this.y + this.getHeight() < B.getY() - 11) {
+        for (BLOCK B : BLOCKS) {
+            if (B.isBuilded()) {
+                if (this.x + this.getWidth() >= B.getX() && this.x <= B.getX() + B.getW()) {
+                    if (this.y + this.getHeight() < B.getY() - 11) {
 
 
-                        } else {
-                            this.y = B.getY() - this.getHeight() - 1;
-                            this.Velocity = 0;
-                            on_ground=true;
-                        }
-
-
+                    } else {
+                        this.y = B.getY() - this.getHeight() - 1;
+                        this.Velocity = 0;
+                        on_ground = true;
                     }
+
+
                 }
-
-
-
-
-        }
-
-
-    }
-    public void BlockAnim() {
-
-        this.BlockAnimCount--;
-
-        if (BlockAnimCount <= 0) {
-
-            BlockAnimCount = BLOCK_ANIM_DELAY;
-            BlockAnimPos = BlockAnimPos + BlockAnimDir;
-
-            if (BlockAnimPos == (BlockAnimCount - 1) ) {
-                BlockAnimPos=0;
             }
-        }
-
-    }
-    public void keyPressed(KeyEvent e) {
-
-        int key = e.getKeyCode();
-        if (key == KeyEvent.VK_F) {
-
-            this.Itemchoosen=!this.Itemchoosen;
-
-        }
-        if (key == KeyEvent.VK_Q) {
-
-            dx = -10;
-
-        }
-
-        if (key == KeyEvent.VK_D) {
-
-            dx = 10;
-        }
-        if (key == KeyEvent.VK_SPACE) {
-			if(on_ground){
-				this.JUMP = true;
-
-			}
 
 
         }
 
-        if (key == KeyEvent.VK_Z) {
-            dy = 10;
-        }
-
-        if (key == KeyEvent.VK_S) {
-            dy = -10;
-        }
 
     }
 
-
-    public void keyReleased(KeyEvent e) {
-
-        int key = e.getKeyCode();
-
-        if (key == KeyEvent.VK_Q) {
-            dx = 0;
-            stopwalk = true;
-        }
-        if (key == KeyEvent.VK_SPACE) {
-
-
-        }
-        if (key == KeyEvent.VK_D) {
-            dx = 0;
-            stopwalk = true;
-        }
-
-        if (key == KeyEvent.VK_Z) {
-            dy = 0;
-            stopwalk = true;
-        }
-
-        if (key == KeyEvent.VK_S) {
-            dy = 0;
-            stopwalk = true;
-        }
+    public boolean getStopWalk() {
+        return stopwalk;
     }
 
+    public void setStopWalk(boolean stopwalk) {
+        this.stopwalk = stopwalk;
+    }
 }
