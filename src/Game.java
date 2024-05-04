@@ -18,6 +18,9 @@ public class Game extends JPanel implements ActionListener{
     private WriteToServer wsRunnable;
     private Container contentPane;
 
+
+    private int blockx=0 ,blocky=0;
+
     public int MouseX, MouseY;
     public HUD hud;
     private Timer timer;
@@ -42,6 +45,13 @@ public class Game extends JPanel implements ActionListener{
     private final List<BLOCK> BLOCKS = new ArrayList<>();
     private final List<ALIEN> ALIENS = new ArrayList<>();
 
+    public void setBlockx(int blockx) {
+        this.blockx = blockx;
+    }
+
+    public void setBlocky(int blocky) {
+        this.blocky = blocky;
+    }
 
     public Game() {
 
@@ -187,36 +197,22 @@ public class Game extends JPanel implements ActionListener{
     }
 
     private void Build(int x,int y){
-
-            for (BLOCK B : BLOCKS) {
-                if (x < B.getX()+B.getW()  && x > B.getX() &&
-                        y <  B.getY() && y > B.getY() - 70 ) {
-                    if (dude.getX() >B.getY()-80 || dude.getX()<B.getY()+B.getW()+80){
-
-                        BLOCKS.add(new BLOCK(B.getX(), B.getY()-70, false, true));
-
-                    }
-
-                }
-                if (x < B.getX()  && x > B.getX()-B.getW() &&
-                        y < B.getH() + B.getY() && y > B.getY() ) {
-
-                    BLOCKS.add(new BLOCK(B.getX()-B.getW(), B.getY(), false, true));
-
-
-
-
-
-                }
-                if (x < B.getX()+ 140 && x > B.getX()+B.getW() &&
-                        y < B.getH() + B.getY() && y > B.getY()) {
-                    BLOCKS.add(new BLOCK(B.getX()+B.getW(), B.getY(), false, true));
-
-                }
-
-
+        List<BLOCK> newBlocks = new ArrayList<>();
+        for (BLOCK B : BLOCKS) {
+            if (x < B.getX()+B.getW()  && x > B.getX() &&
+                    y <  B.getY() && y > B.getY() - 70 ) {
+                newBlocks.add(new BLOCK(B.getX(), B.getY()-70, false, true));
+            }
+            if (x < B.getX()  && x > B.getX()-B.getW() &&
+                    y < B.getH() + B.getY() && y > B.getY() ) {
+                newBlocks.add(new BLOCK(B.getX()-B.getW(), B.getY(), false, true));
+            }
+            if (x < B.getX()+ 140 && x > B.getX()+B.getW() &&
+                    y < B.getH() + B.getY() && y > B.getY()) {
+                newBlocks.add(new BLOCK(B.getX()+B.getW(), B.getY(), false, true));
+            }
         }
-
+        BLOCKS.addAll(newBlocks);
     }
     private void MouseEvents() {
         this.addMouseListener(new MouseListener() {
@@ -245,15 +241,12 @@ public class Game extends JPanel implements ActionListener{
                 final Point pos = e.getPoint();
                 int x = pos.x;
                 int y = pos.y;
-
-
                 if(dude.isChoosiness()){
+                    setBlockx(x);
+                    setBlocky(y);
                     Build(x,y);
+
                 }
-
-
-
-
 
             }
 
@@ -312,7 +305,6 @@ public class Game extends JPanel implements ActionListener{
     private void DrawPlayer(int playerID, Graphics g) {
 
         Graphics2D playerG = (Graphics2D) g;
-
         playerG.drawImage(dude1.getImage(dude1.getDudeAnimPos()), dude1.getX(), dude1.getY(), this);
         playerG.drawImage(dude.getImage(dude.getDudeAnimPos()), dude.getX(), dude.getY(), this);
 
@@ -441,6 +433,7 @@ public class Game extends JPanel implements ActionListener{
             this.in = in;
             System.out.println("Reading from server Runnable created");
         }
+        int block1x,block1y;
         public void run(){
             try {
                 while (true){
@@ -449,6 +442,12 @@ public class Game extends JPanel implements ActionListener{
                         dude1.setX(in.readInt());
                         dude1.setY(in.readInt());
                         dude1.setStopWalk(in.readBoolean());
+                        block1x = in.readInt();
+                        block1y = in.readInt();
+                        if (block1x!=0 && block1y!=0){
+                            System.out.println("Block 1: "+block1x+" "+block1y);
+                            Build(block1x,block1y);
+                        }
 
 
                     }
@@ -493,6 +492,11 @@ public class Game extends JPanel implements ActionListener{
                         out.writeInt(dude.getX());
                         out.writeInt(dude.getY());
                         out.writeBoolean(dude.getStopWalk());
+                        out.writeInt(blockx);
+                        out.writeInt(blocky);
+                        blocky=0;
+                        blockx=0;
+
 
                         out.flush();
                     }
@@ -544,8 +548,8 @@ public class Game extends JPanel implements ActionListener{
 
 
 
-            float XLEN = MouseX - (dude.getX() + (dude.getWidth() / 2));
-            float YLEN = MouseY - (dude.getY() + (dude.getHeight() / 2));
+            float XLEN = MouseX - (dude.getX() + ((float) dude.getWidth() / 2));
+            float YLEN = MouseY - (dude.getY() + ((float) dude.getHeight() / 2));
 
 
             double length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
@@ -560,7 +564,7 @@ public class Game extends JPanel implements ActionListener{
             // board
 
                 dude.doAnim();
-                dude1.doAnim();
+
 
 
 

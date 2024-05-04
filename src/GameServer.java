@@ -112,7 +112,11 @@ public class GameServer {
                             Data1.set(0, in.readInt());
                             Data1.set(1, in.readInt());
                             dir1 = in.readBoolean();
-
+                            p1x = in.readInt();
+                            p1y = in.readInt();
+                        if(p1x!=0 && p1y!=0) {
+                            System.out.println("Block 1: " + p1x + " " + p1y);
+                        }
 
 
 
@@ -122,6 +126,11 @@ public class GameServer {
                         Data2.set(0, in.readInt());
                         Data2.set(1, in.readInt());
                         dir2 = in.readBoolean();
+                        p2x = in.readInt();
+                        p2y = in.readInt();
+                        if(p2x!=0 && p2y!=0) {
+                            System.out.println("Block 2: " + p2x + " " + p2y);
+                        }
 
 
                     }
@@ -152,13 +161,16 @@ public class GameServer {
                         out.writeInt(Data2.get(0));
                         out.writeInt(Data2.get(1));
                         out.writeBoolean(dir2);
-
+                        out.writeInt(p2x);
+                        out.writeInt(p2y);
 
                         out.flush();
                     }else {
                         out.writeInt(Data1.get(0));
                         out.writeInt(Data1.get(1));
                         out.writeBoolean(dir1);
+                        out.writeInt(p1x);
+                        out.writeInt(p1y);
 
                         out.flush();
                     }
