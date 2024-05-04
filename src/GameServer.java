@@ -19,7 +19,7 @@ public class GameServer {
     private WriteToClient p2WriteRunnable;
     private List<Integer> Data1,Data2;
     private int p1x, p1y, p2x, p2y;
-    private int bullet1x,bullet1y,bullet2,bullet2y;
+    private int bullet1x,bullet1y,bullet2x,bullet2y,XLEN,YLEN,XLEN1,YLEN1 , BLOCKSNUMBER ,ALIENX;
     private boolean dir1,dir2;
     private int recieved;
     public GameServer() {
@@ -123,12 +123,17 @@ public class GameServer {
                         if(bullet1x!=0 && bullet1y!=0) {
                             System.out.println("Bullet 1: " + bullet1x + " " + bullet1y);
                         }
+                        XLEN= in.readInt();
+                        YLEN= in.readInt();
+                        BLOCKSNUMBER =in.readInt();
+
 
 
 
 
 
                     }else{
+
                         Data2.set(0, in.readInt());
                         Data2.set(1, in.readInt());
                         dir2 = in.readBoolean();
@@ -137,11 +142,14 @@ public class GameServer {
                         if(p2x!=0 && p2y!=0) {
                             System.out.println("Block 2: " + p2x + " " + p2y);
                         }
-                        bullet2= in.readInt();
+                        bullet2x= in.readInt();
                         bullet2y= in.readInt();
-                        if(bullet2!=0 && bullet2y!=0) {
-                            System.out.println("Bullet 2: " + bullet2 + " " + bullet2y);
+                        if(bullet2x!=0 && bullet2y!=0) {
+                            System.out.println("Bullet 2: " + bullet2x + " " + bullet2y);
                         }
+                        XLEN1= in.readInt();
+                        YLEN1= in.readInt();
+                        BLOCKSNUMBER =in.readInt();
 
 
 
@@ -165,19 +173,30 @@ public class GameServer {
             playerID = pid;
             this.out = out;
             System.out.println("Writing To client "+playerID+" Runnable created");
+            if (BLOCKSNUMBER>5){
+                ALIENX = (int) (Math.random() * 800);
+            }
         }
+
         public void run() {
+
             try {
+
                 while (true){
+
                     if(playerID == 1){
+
                         out.writeInt(Data2.get(0));
                         out.writeInt(Data2.get(1));
                         out.writeBoolean(dir2);
                         out.writeInt(p2x);
                         out.writeInt(p2y);
-                        out.writeInt(bullet2);
+                        out.writeInt(bullet2x);
                         out.writeInt(bullet2y);
-
+                        out.writeInt(XLEN1);
+                        out.writeInt(YLEN1);
+                        out.writeInt(ALIENX);
+                        ALIENX=0;
                         out.flush();
                     }else {
                         out.writeInt(Data1.get(0));
@@ -187,9 +206,15 @@ public class GameServer {
                         out.writeInt(p1y);
                         out.writeInt(bullet1x);
                         out.writeInt(bullet1y);
+                        out.writeInt(XLEN);
+                        out.writeInt(YLEN);
+                        out.writeInt(ALIENX);
+                        ALIENX=0;
+
 
                         out.flush();
                     }
+
                     try {
                         Thread.sleep(25);
                     }catch (InterruptedException e){

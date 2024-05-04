@@ -19,7 +19,8 @@ public class Game extends JPanel implements ActionListener{
     private Container contentPane;
     private int blockx=0 ,blocky=0;
     private int bulletx=0,bullety=0;
-    public int MouseX, MouseY;
+    public int MouseX,XLEN1, MouseY,YLEN1,XLEN,YLEN;
+    public int ALIENX;
     public HUD hud;
     private Timer timer;
     private int mapAnimPos;
@@ -230,11 +231,6 @@ public class Game extends JPanel implements ActionListener{
 
                     }
                 }
-
-
-
-
-
             }
 
             @Override
@@ -284,6 +280,7 @@ public class Game extends JPanel implements ActionListener{
             public void mouseMoved(MouseEvent e) {
                 int x = e.getX();
                 int y = e.getY();
+
                 MouseX = x;
                 MouseY = y;
 
@@ -314,7 +311,7 @@ public class Game extends JPanel implements ActionListener{
     }
 
     private void Checkill(){
-        if (!ALIENS.isEmpty()&& !dude.Bullets.isEmpty()) {
+        if (!ALIENS.isEmpty()&& (!dude.Bullets.isEmpty()||!dude1.Bullets.isEmpty())) {
             for (ALIEN A:ALIENS){
                 for (Bullet B:dude.Bullets){
                         if(B.x+B.getW()<A.getX()+A.getW() && B.x>A.getX() && B.y+B.getH()<A.getY()+A.getH() && B.y>A.getY()){
@@ -323,12 +320,23 @@ public class Game extends JPanel implements ActionListener{
 
                         }
                     }
+                for (Bullet B:dude1.Bullets){
+                    if(B.x+B.getW()<A.getX()+A.getW() && B.x>A.getX() && B.y+B.getH()<A.getY()+A.getH() && B.y>A.getY()) {
+                        B.setVisible(false);
+                        A.setAlive(false);
 
+                    }
                 }
+                }
+
+            }
 
         }
 
-    }
+
+
+
+
     private void CheckDestroy(){
         for(ALIEN A:ALIENS) {
             for (AlienBullet B : A.bullets) {
@@ -369,7 +377,9 @@ public class Game extends JPanel implements ActionListener{
         if (BLOCKS.size()>5){
             if(ALIENS.isEmpty()){
 
-                ALIENS.add(new ALIEN((int) (Math.random()*getWidth()), -40));
+
+                ALIENS.add(new ALIEN( ALIENX, -40));
+
             }
         }
 
@@ -464,6 +474,13 @@ public class Game extends JPanel implements ActionListener{
                             System.out.println("Bullet 1: "+bullet1x+" "+bullet1y);
                             dude1.Shoot(bullet1x,bullet1y);
                         }
+                        XLEN1=in.readInt();
+                        YLEN1=in.readInt();
+                        ALIENX=in.readInt();
+
+
+
+
 
 
 
@@ -517,6 +534,14 @@ public class Game extends JPanel implements ActionListener{
                         out.writeInt(bullety);
                         bulletx=0;
                         bullety=0;
+                        out.writeInt(XLEN);
+                        out.writeInt(YLEN);
+                        XLEN=0;
+                        YLEN=0;
+
+                        out.writeInt(BLOCKS.size());
+
+
 
                         out.flush();
                     }
@@ -562,8 +587,8 @@ public class Game extends JPanel implements ActionListener{
 
             Graphics2D g2d = (Graphics2D) g;
 
-            float XLEN = MouseX - (dude.getX() + ((float) dude.getWidth() / 2));
-            float YLEN = MouseY - (dude.getY() + ((float) dude.getHeight() / 2));
+             XLEN = (int)( MouseX - (dude.getX() + ((float) dude.getWidth() / 2)));
+             YLEN = (int)(MouseY - (dude.getY() + ((float) dude.getHeight() / 2)));
 
 
             double length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
@@ -627,10 +652,10 @@ public class Game extends JPanel implements ActionListener{
                 g2d.rotate(angle, dude.BOMBA.getX()+10, dude.BOMBA.getY());
                 g2d.drawImage(dude.BOMBA.getImage(), dude.BOMBA.getX(), dude.BOMBA.getY(), this);
 
-
-
             }
 
+                dude1.BOMBA.setX((int) (((dude1.getX() + dude1.getWidth() / 2) + XLEN1 * 40 / length) ));
+                dude1.BOMBA.setY((int) ((dude1.getY() + dude1.getHeight() / 2) + YLEN1 * 40 / length) );
 
 
             this.repaint();
