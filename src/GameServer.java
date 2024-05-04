@@ -1,9 +1,11 @@
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class GameServer {
     private ServerSocket ss;
@@ -17,6 +19,7 @@ public class GameServer {
     private WriteToClient p2WriteRunnable;
     private List<Integer> Data1,Data2;
     private int p1x, p1y, p2x, p2y;
+    private boolean dir1,dir2;
     private int recieved;
     public GameServer() {
         System.out.println("==== Game Server ====");
@@ -108,19 +111,18 @@ public class GameServer {
 
                             Data1.set(0, in.readInt());
                             Data1.set(1, in.readInt());
+                            dir1 = in.readBoolean();
 
 
 
 
-
-                        System.out.println("ID1: "+p1x+" "+p1y);
 
 
                     }else{
                         Data2.set(0, in.readInt());
                         Data2.set(1, in.readInt());
+                        dir2 = in.readBoolean();
 
-                        System.out.println("ID2: "+p2x+" "+p2y);
 
                     }
                     try {
@@ -149,13 +151,14 @@ public class GameServer {
                     if(playerID == 1){
                         out.writeInt(Data2.get(0));
                         out.writeInt(Data2.get(1));
+                        out.writeBoolean(dir2);
 
 
                         out.flush();
                     }else {
                         out.writeInt(Data1.get(0));
                         out.writeInt(Data1.get(1));
-
+                        out.writeBoolean(dir1);
 
                         out.flush();
                     }

@@ -1,6 +1,5 @@
+import javax.swing.*;
 import java.awt.*;
-
-import javax.swing.ImageIcon;
 
 public class Bullet {
     double angle;
@@ -90,7 +89,7 @@ public class Bullet {
         }
 
 
-        System.out.println(x);
+        //System.out.println(x);
     }
 
     public void setVisible(boolean isVisible)//down

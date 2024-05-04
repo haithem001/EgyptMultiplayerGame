@@ -1,9 +1,7 @@
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import javax.swing.ImageIcon;
 
 public class Dude {
     public final int BLOCK_ANIM_DELAY;
@@ -235,31 +233,27 @@ public class Dude {
                 }
             }
             if (dx >= 1) {
-                stopwalk = true;
                 lastdir = dx;
                 return WRIGHT[p];
 
             } else if (dx <= -1) {
-                stopwalk = true;
                 lastdir = dx;
                 return WLEFT[p];
 
             }
-
-            if (dy >= 1 || dy <= -1) {
-
-                if (stopwalk == true) {
-
-                    return WRIGHT[p];
-                } else {
-                    return WLEFT[p];
-                }
-
-            }
-
         }
 
-        return (stopwalk == true) ? WRIGHT[dx] : WLEFT[dx];
+
+
+
+        if (stopwalk) {
+
+            return WRIGHT[dx];
+        } else {
+            return WLEFT[dx];
+        }
+
+
 
     }
 

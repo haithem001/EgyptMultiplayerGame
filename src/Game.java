@@ -1,12 +1,12 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
-import javax.swing.*;
 
 
 public class Game extends JPanel implements ActionListener{
@@ -98,13 +98,13 @@ public class Game extends JPanel implements ActionListener{
 
                 }
                 if (key == KeyEvent.VK_Q) {
-
+                    dude.setStopWalk(false);
                     dude.setDx(-10);
 
                 }
 
                 if (key == KeyEvent.VK_D) {
-
+                    dude.setStopWalk(true);
                     dude.setDx(10);
                 }
                 if (key == KeyEvent.VK_SPACE) {
@@ -125,7 +125,7 @@ public class Game extends JPanel implements ActionListener{
 
                 if (key == KeyEvent.VK_Q) {
                     dude.setDx(0);
-                    dude.setStopWalk(true);
+                    dude.setStopWalk(false);
                 }
                 if (key == KeyEvent.VK_SPACE) {
 
@@ -371,15 +371,16 @@ public class Game extends JPanel implements ActionListener{
 
         // COINS ANIM
         switch (mapAnimPos) {
+
             case 0:
                 g2d.drawImage(hud.getCoinImage(0), hud.getX() + 25, hud.getY() + 50, this);
                 break;
             case 1:
                 g2d.drawImage(hud.getCoinImage(1), hud.getX() + 25, hud.getY() + 50, this);
                 break;
-            default:
-                g2d.drawImage(hud.getCoinImage(0), hud.getX() + 25, hud.getY() + 50, this);
+
         }
+
 
         g2d.drawString(hud.getCoins(), hud.getX() + 55, hud.getY() + 67);
         g2d.drawString(":", hud.getX() + 43, hud.getY() + 65);
@@ -528,7 +529,7 @@ public class Game extends JPanel implements ActionListener{
 
                         dude1.setX(in.readInt());
                         dude1.setY(in.readInt());
-
+                        dude1.setStopWalk(in.readBoolean());
 
 
                     }
@@ -572,6 +573,7 @@ public class Game extends JPanel implements ActionListener{
                     if (dude != null) {
                         out.writeInt(dude.getX());
                         out.writeInt(dude.getY());
+                        out.writeBoolean(dude.getStopWalk());
 
                         out.flush();
                     }
@@ -637,14 +639,17 @@ public class Game extends JPanel implements ActionListener{
 
         }*/
             // board
-            if (dude.isWalking() == true) {
+            if (dude.isWalking()) {
 
                 dude.doAnim();
+            }
+            if(dude1.isWalking()){
+                dude1.doAnim();
             }
 
 
 
-            MapAnim();
+            //MapAnim();
             DrawPlayer(1,g);
             DrawPlayer(2,g);
 
@@ -758,7 +763,7 @@ public class Game extends JPanel implements ActionListener{
 
             if (key == KeyEvent.VK_Q) {
                 dude.setDx(0);
-                dude.setStopWalk(true);
+                dude.setStopWalk(false);
             }
             if (key == KeyEvent.VK_SPACE) {
 
