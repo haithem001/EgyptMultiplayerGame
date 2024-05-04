@@ -19,6 +19,7 @@ public class GameServer {
     private WriteToClient p2WriteRunnable;
     private List<Integer> Data1,Data2;
     private int p1x, p1y, p2x, p2y;
+    private int bullet1x,bullet1y,bullet2,bullet2y;
     private boolean dir1,dir2;
     private int recieved;
     public GameServer() {
@@ -117,6 +118,11 @@ public class GameServer {
                         if(p1x!=0 && p1y!=0) {
                             System.out.println("Block 1: " + p1x + " " + p1y);
                         }
+                        bullet1x= in.readInt();
+                        bullet1y= in.readInt();
+                        if(bullet1x!=0 && bullet1y!=0) {
+                            System.out.println("Bullet 1: " + bullet1x + " " + bullet1y);
+                        }
 
 
 
@@ -131,6 +137,12 @@ public class GameServer {
                         if(p2x!=0 && p2y!=0) {
                             System.out.println("Block 2: " + p2x + " " + p2y);
                         }
+                        bullet2= in.readInt();
+                        bullet2y= in.readInt();
+                        if(bullet2!=0 && bullet2y!=0) {
+                            System.out.println("Bullet 2: " + bullet2 + " " + bullet2y);
+                        }
+
 
 
                     }
@@ -163,6 +175,8 @@ public class GameServer {
                         out.writeBoolean(dir2);
                         out.writeInt(p2x);
                         out.writeInt(p2y);
+                        out.writeInt(bullet2);
+                        out.writeInt(bullet2y);
 
                         out.flush();
                     }else {
@@ -171,6 +185,8 @@ public class GameServer {
                         out.writeBoolean(dir1);
                         out.writeInt(p1x);
                         out.writeInt(p1y);
+                        out.writeInt(bullet1x);
+                        out.writeInt(bullet1y);
 
                         out.flush();
                     }

@@ -89,7 +89,7 @@ public class Bullet {
         }
 
 
-        //System.out.println(x);
+
     }
 
     public void setVisible(boolean isVisible)//down
