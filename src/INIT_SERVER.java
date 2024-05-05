@@ -1,7 +1,8 @@
 import javax.swing.*;
-
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class INIT_SERVER extends JFrame implements ActionListener {
     // JTextField
     static JTextField IP=new JTextField(16);
@@ -14,6 +15,7 @@ public class INIT_SERVER extends JFrame implements ActionListener {
 
     // JButton
     static JButton b= new JButton("submit");
+    static JButton j= new JButton("join");
 
     // label to display text
     static JLabel l= new JLabel("nothing entered");
@@ -23,9 +25,10 @@ public class INIT_SERVER extends JFrame implements ActionListener {
 
      }
     public static void text(){
+
          INIT_SERVER te = new INIT_SERVER();
          b.addActionListener(te);
-
+         j.addActionListener(te);
          JPanel p = new JPanel();
          p.setLayout(new GridLayout(5,1,0,0));
          p.setBackground(Color.black);
@@ -33,7 +36,7 @@ public class INIT_SERVER extends JFrame implements ActionListener {
          p.add(PORT);
          p.add(NICKNAME);
          p.add(PLAYER_ID);
-
+         p.add(j);
          p.add(b);
          p.add(l);
          f.add(p);
@@ -51,17 +54,38 @@ public class INIT_SERVER extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String s = e.getActionCommand();
-        if (s.equals("submit")) {
+
+        if (s.equals("join")) {
             // set the text of the label to the text of the field
             f.dispose();
-
             l.setText(IP.getText());
             LaunchGame server = new LaunchGame();
             server.setSize(this.getSize());
             server.setVisible(true);
             server.setBackground(Color.black);
-            //GameServer gs = new GameServer();
-            //gs.acceptConnection();
+            // set the text of field to blank
+            IP.setText("  ");
+        }
+        if (s.equals("submit")) {
+            // set the text of the label to the text of the field
+
+            l.setText(IP.getText());
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    GameServer gs = new GameServer("src/GameServer.java");
+                    gs.acceptConnection();
+                    try{
+                        Thread.sleep(5);
+                    }catch (InterruptedException e){
+                        System.out.println("Server Error");
+                    }
+                }
+            });
+            t.start();
+
+
+
             // set the text of field to blank
             IP.setText("  ");
         }
