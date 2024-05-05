@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -20,7 +21,7 @@ public class Game extends JPanel implements ActionListener{
     private int blockx=0 ,blocky=0;
     private int bulletx=0,bullety=0;
     public int MouseX,XLEN1, MouseY,YLEN1,XLEN,YLEN;
-    public int ALIENX;
+    public int ALIENX=0;
     public HUD hud;
     private Timer timer;
     private int mapAnimPos;
@@ -37,7 +38,7 @@ public class Game extends JPanel implements ActionListener{
     private final int platform = 850;
     private final List<BLOCK> BLOCKS = new ArrayList<>();
     private final List<ALIEN> ALIENS = new ArrayList<>();
-
+    private static List<Integer> ax = Arrays.asList(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000);
     public void setBlockx(int blockx) {
         this.blockx = blockx;
     }
@@ -376,10 +377,11 @@ public class Game extends JPanel implements ActionListener{
 
         if (BLOCKS.size()>5){
             if(ALIENS.isEmpty()){
-
-
-                ALIENS.add(new ALIEN( ALIENX, -40));
-
+                ALIENS.add(new ALIEN(ax.get(ALIENX), -40));
+                ALIENX++;
+                if (ALIENX>9){
+                    ALIENX=0;
+                }
             }
         }
 
@@ -408,12 +410,15 @@ public class Game extends JPanel implements ActionListener{
         for (ALIEN A : ALIENS) {
             if (A.getDy()==0){
                 if (A.bullets.isEmpty()){
-                    if (Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())){
+                    if(((Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-dude.getX()))&&(Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())))||((Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-dude1.getX()))&&(Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())))){
                         A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX(),BLOCKS.get(0).getY());
 
                     }
-                    else{
+                    else if (((Math.abs(A.getX()-dude1.getX())<Math.abs(A.getX()-BLOCKS.get(0).getY()))&&(Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-dude.getX())))||((Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY()))&&(Math.abs(A.getX()-BLOCKS.get(0).getY())>Math.abs(A.getX()-dude.getX())))){
                         A.shoot(A.getX(),A.getY(),dude.getX(),dude.getY());
+                    }else{
+                        A.shoot(A.getX(),A.getY(),dude1.getX(),dude1.getY());
+
                     }
                 }
             }
@@ -476,11 +481,6 @@ public class Game extends JPanel implements ActionListener{
                         }
                         XLEN1=in.readInt();
                         YLEN1=in.readInt();
-                        ALIENX=in.readInt();
-
-
-
-
 
 
 
@@ -536,12 +536,6 @@ public class Game extends JPanel implements ActionListener{
                         bullety=0;
                         out.writeInt(XLEN);
                         out.writeInt(YLEN);
-                        XLEN=0;
-                        YLEN=0;
-
-                        out.writeInt(BLOCKS.size());
-
-
 
                         out.flush();
                     }

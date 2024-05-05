@@ -125,7 +125,7 @@ public class GameServer {
                         }
                         XLEN= in.readInt();
                         YLEN= in.readInt();
-                        BLOCKSNUMBER =in.readInt();
+
 
 
 
@@ -149,7 +149,7 @@ public class GameServer {
                         }
                         XLEN1= in.readInt();
                         YLEN1= in.readInt();
-                        BLOCKSNUMBER =in.readInt();
+
 
 
 
@@ -173,9 +173,7 @@ public class GameServer {
             playerID = pid;
             this.out = out;
             System.out.println("Writing To client "+playerID+" Runnable created");
-            if (BLOCKSNUMBER>5){
-                ALIENX = (int) (Math.random() * 800);
-            }
+
         }
 
         public void run() {
@@ -195,8 +193,8 @@ public class GameServer {
                         out.writeInt(bullet2y);
                         out.writeInt(XLEN1);
                         out.writeInt(YLEN1);
-                        out.writeInt(ALIENX);
-                        ALIENX=0;
+
+
                         out.flush();
                     }else {
                         out.writeInt(Data1.get(0));
@@ -208,8 +206,7 @@ public class GameServer {
                         out.writeInt(bullet1y);
                         out.writeInt(XLEN);
                         out.writeInt(YLEN);
-                        out.writeInt(ALIENX);
-                        ALIENX=0;
+
 
 
                         out.flush();
