@@ -3,17 +3,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Scanner;
 
 
 public class Game extends JPanel implements ActionListener{
@@ -31,8 +27,21 @@ public class Game extends JPanel implements ActionListener{
     public HUD hud;
     private Timer timer;
     private int DELAY = 60;
+    private int x=5,i=0;
     private int Score;
+    private String ip;
+    private int port;
+    private String nickname1;
+    private Scanner sc=new Scanner(System.in);
+    private String msg = "";
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
+
+
+
+    private String nickname;
     private Image background ;
 
     private final int platform = 850;
@@ -54,7 +63,10 @@ public class Game extends JPanel implements ActionListener{
         this.bullety = bullety;
     }
 
-    public Game() {
+    public Game(String nickname,String ip, int port) {
+        this.nickname = nickname;
+        this.ip = ip;
+        this.port = port;
         ImageIcon Background = new ImageIcon("src/Background.png");
         background = Background.getImage();
         BLOCKS.add(new BLOCK(600, 861, true, true));
@@ -488,6 +500,7 @@ public class Game extends JPanel implements ActionListener{
             this.in = in;
             System.out.println("Reading from server Runnable created");
         }
+        String msg1;
         int block1x,block1y;
         int bullet1x,bullet1y;
         public void run(){
@@ -513,6 +526,11 @@ public class Game extends JPanel implements ActionListener{
                         XLEN1=in.readInt();
                         YLEN1=in.readInt();
                         dude1.setHealth(in.readInt());
+                        msg1= in.readUTF();
+                        nickname1 = in.readUTF();
+                        if(!msg1.equals("")){
+                            System.out.println(nickname1+": "+msg1);
+                        }
 
 
 
@@ -536,7 +554,22 @@ public class Game extends JPanel implements ActionListener{
                 System.out.println("Message from server : "+startMsg);
                 Thread readThread = new Thread(rfsRunnable);
                 Thread writeThread = new Thread(wsRunnable);
+                Thread sendmsgThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while(true){
+                            msg = sc.nextLine();
+                            setMsg(msg);
+                            try{
+                                Thread.sleep(25);
+                            }catch (InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        }
 
+                    }
+                });
+                sendmsgThread.start();
                 readThread.start();
                 writeThread.start();
             }catch (IOException e){
@@ -569,6 +602,9 @@ public class Game extends JPanel implements ActionListener{
                         out.writeInt(XLEN);
                         out.writeInt(YLEN);
                         out.writeInt(dude.getHealth());
+                        out.writeUTF(msg);
+                        msg="";
+                        out.writeUTF(nickname);
 
                         out.flush();
                     }
@@ -586,14 +622,15 @@ public class Game extends JPanel implements ActionListener{
 
     private void connectToServer(){
         try{
-            socket = new Socket("localhost",45371);
+            System.out.println(ip+":"+port);
+            socket = new Socket(ip,port);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
 
             playerID = in.readInt();
             System.out.println("You are player#"+playerID);
-            System.out.println(socket.getInetAddress().getHostAddress());
+            System.out.println("your name: "+nickname);
             if(playerID ==1){
                 System.out.println("Waiting for player #2 to connects...");
             }
@@ -628,11 +665,7 @@ public class Game extends JPanel implements ActionListener{
 
             DrawPlayerHealth(g2d);
 
-            if(dude1.getHealth()<1){
-                g2d.drawImage(dude.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
-                g2d.drawImage(dude1.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
 
-            }
             List<ALIEN> newAliens = new ArrayList<>(ALIENS);
             for (ALIEN alien : newAliens) {
                 g2d.drawImage(alien.getImage(), alien.getX(),alien.getY(), this);
@@ -669,10 +702,14 @@ public class Game extends JPanel implements ActionListener{
                     g2d.fillOval(X.getX(), X.getY(), 10, 10);
                 }
             }
-
-            if(dude.getHealth()<1){
+            if(dude1.getHealth()<1 && i==0){
+                x=dude1.getHealth();
+                i++;
+            }
+            if((dude.getHealth()<1)||(x<1)){
                 g2d.drawImage(dude.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
                 g2d.drawImage(dude1.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
+
 
             }
             if (dude.isChoosiness()){

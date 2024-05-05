@@ -1,33 +1,21 @@
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 public class LaunchGame extends JFrame  implements ActionListener{
 
-LaunchGame(){
+    LaunchGame(String nickname, String ip, int port){
 
-
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		//this.setUndecorated(true);
 
 
 		this. setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBackground(Color.black);
-		Game game = new Game();
+		Game game = new Game(nickname, ip, port);
+
+		System.out.println("LaunchGame: "+ nickname);
 		this.setVisible(true);
 
 

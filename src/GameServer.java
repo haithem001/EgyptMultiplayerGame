@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,14 +20,24 @@ public class GameServer {
     private WriteToClient p2WriteRunnable;
     private List<Integer> Data1,Data2;
     private int p1x, p1y, p2x, p2y;
-    private int bullet1x,bullet1y,bullet2x,bullet2y,XLEN,YLEN,XLEN1,YLEN1 , BLOCKSNUMBER ,ALIENX,HEALTH=4;
+    private int port ;
+    private String msg1, msg2;
+    private String nickname1,nickname2;
+
+
+
+    private int bullet1x,bullet1y,bullet2x,bullet2y,XLEN,YLEN,XLEN1,YLEN1 ,HEALTH=4;
     private boolean dir1,dir2;
     private int recieved;
-    public GameServer(String s) {
+    public GameServer(int port) {
+        this.port = port;
         System.out.println("==== Game Server ====");
         numPlayers = 0;
         maxPlayers = 2;
-
+        msg1="";
+        msg2="";
+        nickname1="";
+        nickname2="";
         Data1=new ArrayList<>();
         Data1.add(300);
         Data1.add(750);
@@ -39,7 +50,7 @@ public class GameServer {
 
 
         try {
-            ss= new ServerSocket(45371);
+            ss= new ServerSocket(port);
 
         }catch (IOException e) {
             System.out.println("Server Error");
@@ -49,9 +60,14 @@ public class GameServer {
         try{
 
             System.out.println("waiting for connection...");
+            System.out.println("Port:"+ port);
+            System.out.println("IP address: "+InetAddress.getLocalHost().getHostAddress());
+
+
 
             while (numPlayers < maxPlayers) {
                 Socket s = ss.accept();
+
                 DataInputStream in = new DataInputStream(s.getInputStream());
                 DataOutputStream out = new DataOutputStream(s.getOutputStream());
                 numPlayers++;
@@ -126,6 +142,8 @@ public class GameServer {
                         XLEN= in.readInt();
                         YLEN= in.readInt();
                         HEALTH=in.readInt();
+                        msg1= in.readUTF();
+                        nickname1 = in.readUTF();
 
 
 
@@ -151,7 +169,8 @@ public class GameServer {
                         XLEN1= in.readInt();
                         YLEN1= in.readInt();
                         HEALTH=in.readInt();
-
+                        msg2= in.readUTF();
+                        nickname2 = in.readUTF();
 
 
 
@@ -196,7 +215,8 @@ public class GameServer {
                         out.writeInt(XLEN1);
                         out.writeInt(YLEN1);
                         out.writeInt(HEALTH);
-
+                        out.writeUTF(msg2);
+                        out.writeUTF(nickname2);
 
                         out.flush();
                     }else {
@@ -210,7 +230,8 @@ public class GameServer {
                         out.writeInt(XLEN);
                         out.writeInt(YLEN);
                         out.writeInt(HEALTH);
-
+                        out.writeUTF(msg1);
+                        out.writeUTF(nickname1);
 
 
                         out.flush();
@@ -234,11 +255,13 @@ public class GameServer {
             }
         }
     }
+
     public static void main(String[] args){
-        GameServer gs = new GameServer("src/GameServer.java");
+        GameServer gs = new GameServer(45793);
 
         gs.acceptConnection();
 
 
     }
+
 }
