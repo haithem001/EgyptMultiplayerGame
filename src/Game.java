@@ -5,9 +5,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 
 public class Game extends JPanel implements ActionListener{
@@ -24,16 +30,10 @@ public class Game extends JPanel implements ActionListener{
     public int ALIENX=0;
     public HUD hud;
     private Timer timer;
-    private int mapAnimPos;
-    private int mapAnimCount;
-    private int MAP_ANIM_DELAY;
-    private int MAP_ANIM_COUNT;
-    private int mapAnimDir;
     private int DELAY = 60;
-    private final int DUDE_ANIM_DELAY = DELAY * 15;
+    private int Score;
 
-
-
+    private Image background ;
 
     private final int platform = 850;
     private final List<BLOCK> BLOCKS = new ArrayList<>();
@@ -55,13 +55,14 @@ public class Game extends JPanel implements ActionListener{
     }
 
     public Game() {
-
+        ImageIcon Background = new ImageIcon("src/Background.png");
+        background = Background.getImage();
         BLOCKS.add(new BLOCK(600, 861, true, true));
         //!BASE BLOCK[0]
         BLOCKS.get(0).BODY.setLocation(600, 861);
         BLOCKS.get(0).BODY.setBounds(600, 861, 70, 70);
         initGame();
-
+        LoadFont();
 
 
     }
@@ -182,10 +183,35 @@ public class Game extends JPanel implements ActionListener{
 
     }
 
+    private Font LoadFont(){
+        try {
+            //Returned font is of pt size 1
+            Font font = Font.createFont(Font.TRUETYPE_FONT, new File("/src/slkscr.ttf"));
+
+            //Derive and return a 12 pt version:
+            //Need to use float otherwise
+            //it would be interpreted as style
+
+            return font.deriveFont(Font.PLAIN, 24);
+
+        } catch (IOException|FontFormatException e) {
+            // Handle exception
+        }
+        return null;
+    }
 
 
+    private void DrawScore(Graphics g){
+        Graphics2D g2d = (Graphics2D) g;
 
 
+        g2d.setColor(new Color(255, 215, 0));
+        g2d.setFont(LoadFont());
+        g2d.setFont(new Font("Monospaced", Font.PLAIN, 30));
+        g2d.drawString("SCORE : "+ Score, 30, 50);
+
+
+    }
 
 
     private void DrawPlayerHealth(Graphics2D g2d) {
@@ -318,13 +344,14 @@ public class Game extends JPanel implements ActionListener{
                         if(B.x+B.getW()<A.getX()+A.getW() && B.x>A.getX() && B.y+B.getH()<A.getY()+A.getH() && B.y>A.getY()){
                             B.setVisible(false);
                             A.setAlive(false);
-
+                            Score++;
                         }
                     }
                 for (Bullet B:dude1.Bullets){
                     if(B.x+B.getW()<A.getX()+A.getW() && B.x>A.getX() && B.y+B.getH()<A.getY()+A.getH() && B.y>A.getY()) {
                         B.setVisible(false);
                         A.setAlive(false);
+                        Score++;
 
                     }
                 }
@@ -368,6 +395,9 @@ public class Game extends JPanel implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
+        if(dude.getHealth()<0||dude1.getHealth()<0){
+            timer.stop();
+        }
         for (BLOCK B : BLOCKS) {
             if (B.isBuilded()) {
                 B.BODY.setLocation(B.getX(), B.getY());
@@ -410,14 +440,15 @@ public class Game extends JPanel implements ActionListener{
         for (ALIEN A : ALIENS) {
             if (A.getDy()==0){
                 if (A.bullets.isEmpty()){
+
                     if(((Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-dude.getX()))&&(Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())))||((Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-dude1.getX()))&&(Math.abs(A.getX()-dude.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY())))){
-                        A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX(),BLOCKS.get(0).getY());
+                        A.shoot(A.getX(),A.getY(),BLOCKS.get(0).getX()+(BLOCKS.get(0).getW()/2),BLOCKS.get(0).getY()+(BLOCKS.get(0).getH()/2));
 
                     }
                     else if (((Math.abs(A.getX()-dude1.getX())<Math.abs(A.getX()-BLOCKS.get(0).getY()))&&(Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-dude.getX())))||((Math.abs(A.getX()-dude1.getX())>Math.abs(A.getX()-BLOCKS.get(0).getY()))&&(Math.abs(A.getX()-BLOCKS.get(0).getY())>Math.abs(A.getX()-dude.getX())))){
-                        A.shoot(A.getX(),A.getY(),dude.getX(),dude.getY());
+                        A.shoot(A.getX(),A.getY(),dude.getX()+(dude.getWidth()/2),dude.getY()+(dude.getHeight()/2));
                     }else{
-                        A.shoot(A.getX(),A.getY(),dude1.getX(),dude1.getY());
+                        A.shoot(A.getX(),A.getY(),dude1.getX()+(dude1.getWidth()/2),dude1.getY()+(dude.getHeight()/2));
 
                     }
                 }
@@ -481,6 +512,7 @@ public class Game extends JPanel implements ActionListener{
                         }
                         XLEN1=in.readInt();
                         YLEN1=in.readInt();
+                        dude1.setHealth(in.readInt());
 
 
 
@@ -536,6 +568,7 @@ public class Game extends JPanel implements ActionListener{
                         bullety=0;
                         out.writeInt(XLEN);
                         out.writeInt(YLEN);
+                        out.writeInt(dude.getHealth());
 
                         out.flush();
                     }
@@ -580,7 +613,7 @@ public class Game extends JPanel implements ActionListener{
             super.paintComponent(g);
 
             Graphics2D g2d = (Graphics2D) g;
-
+            g2d.drawImage(background, 0, 210, this);
              XLEN = (int)( MouseX - (dude.getX() + ((float) dude.getWidth() / 2)));
              YLEN = (int)(MouseY - (dude.getY() + ((float) dude.getHeight() / 2)));
 
@@ -588,12 +621,18 @@ public class Game extends JPanel implements ActionListener{
             double length = Math.sqrt(XLEN * XLEN + YLEN * YLEN);
 
                 dude.doAnim();
-
+            DrawScore(g);
             //MapAnim();
             DrawPlayer(1,g);
             DrawPlayer(2,g);
 
             DrawPlayerHealth(g2d);
+
+            if(dude1.getHealth()<1){
+                g2d.drawImage(dude.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
+                g2d.drawImage(dude1.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
+
+            }
             List<ALIEN> newAliens = new ArrayList<>(ALIENS);
             for (ALIEN alien : newAliens) {
                 g2d.drawImage(alien.getImage(), alien.getX(),alien.getY(), this);
@@ -631,7 +670,11 @@ public class Game extends JPanel implements ActionListener{
                 }
             }
 
+            if(dude.getHealth()<1){
+                g2d.drawImage(dude.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
+                g2d.drawImage(dude1.GameOver(), this.getWidth()/3, this.getHeight()/3, this);
 
+            }
             if (dude.isChoosiness()){
                 dude.Axe.setX((int) (((dude.getX() + dude.getWidth() / 2) + XLEN * 40 / length) ));
                 dude.Axe.setY((int) ((dude.getY() + dude.getHeight() / 2) + YLEN * 40 / length) );

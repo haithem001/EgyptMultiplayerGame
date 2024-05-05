@@ -19,7 +19,7 @@ public class GameServer {
     private WriteToClient p2WriteRunnable;
     private List<Integer> Data1,Data2;
     private int p1x, p1y, p2x, p2y;
-    private int bullet1x,bullet1y,bullet2x,bullet2y,XLEN,YLEN,XLEN1,YLEN1 , BLOCKSNUMBER ,ALIENX;
+    private int bullet1x,bullet1y,bullet2x,bullet2y,XLEN,YLEN,XLEN1,YLEN1 , BLOCKSNUMBER ,ALIENX,HEALTH=4;
     private boolean dir1,dir2;
     private int recieved;
     public GameServer() {
@@ -125,6 +125,7 @@ public class GameServer {
                         }
                         XLEN= in.readInt();
                         YLEN= in.readInt();
+                        HEALTH=in.readInt();
 
 
 
@@ -149,6 +150,7 @@ public class GameServer {
                         }
                         XLEN1= in.readInt();
                         YLEN1= in.readInt();
+                        HEALTH=in.readInt();
 
 
 
@@ -193,6 +195,7 @@ public class GameServer {
                         out.writeInt(bullet2y);
                         out.writeInt(XLEN1);
                         out.writeInt(YLEN1);
+                        out.writeInt(HEALTH);
 
 
                         out.flush();
@@ -206,6 +209,7 @@ public class GameServer {
                         out.writeInt(bullet1y);
                         out.writeInt(XLEN);
                         out.writeInt(YLEN);
+                        out.writeInt(HEALTH);
 
 
 

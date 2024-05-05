@@ -26,6 +26,7 @@ public class Dude {
     private boolean walking = true;
     private Image[] WRIGHT = new Image[2];
     private Image[] WLEFT = new Image[2];
+    private Image Over;
     private Image HEART;
     private int dudeAnimDir = 1;
     private int dudeAnimPos = 0;
@@ -80,16 +81,20 @@ public class Dude {
         Bullets.add(new Bullet(BOMBA.getX(), BOMBA.getY(), MouseX, MouseY));
     }
 
+    public Image GameOver() {
+        return Over;
+    }
+
     private void loadPlayerIms() {
 
-
+        ImageIcon Gameover = new ImageIcon("src/GameOver.png");
         ImageIcon ii1 = new ImageIcon("src/PLAYER1_1.png");
         ImageIcon ii2 = new ImageIcon("src/PLAYER1_2.png");
         ImageIcon ii3 = new ImageIcon("src/PLAYER1_1L.png");
         ImageIcon ii4 = new ImageIcon("src/PLAYER1_2L.png");
         ImageIcon HEALTHICON = new ImageIcon("src/HEALTH.png");
         HEART = HEALTHICON.getImage();
-
+        Over=Gameover.getImage();
         this.WRIGHT[0] = ii1.getImage();
         this.WRIGHT[1] = ii2.getImage();
         this.WLEFT[0] = ii3.getImage();
