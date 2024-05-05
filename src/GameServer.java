@@ -22,7 +22,7 @@ public class GameServer {
     private int bullet1x,bullet1y,bullet2x,bullet2y,XLEN,YLEN,XLEN1,YLEN1 , BLOCKSNUMBER ,ALIENX,HEALTH=4;
     private boolean dir1,dir2;
     private int recieved;
-    public GameServer() {
+    public GameServer(String s) {
         System.out.println("==== Game Server ====");
         numPlayers = 0;
         maxPlayers = 2;
@@ -235,7 +235,7 @@ public class GameServer {
         }
     }
     public static void main(String[] args){
-        GameServer gs = new GameServer();
+        GameServer gs = new GameServer("src/GameServer.java");
 
         gs.acceptConnection();
 
