@@ -33,11 +33,14 @@ public class Messenger extends JPanel implements ActionListener {
 
         border = BorderFactory.createLineBorder(Color.BLUE, 1);
         textField.setBorder(border);
+        textField.setFont(new Font("Serif",Font.BOLD,40));
+
 
         Messages.setBackground(Color.BLACK);
         Messages.setForeground(Color.white);
-        Messages.append("Chats: \n");
+        Messages.append("             Chats \n");
         Messages.setEditable(false);
+        Messages.setFont(new Font("Serif",Font.BOLD,40));
         textField.setText("> ");
         panel.add(textField, BorderLayout.PAGE_START);
         panel.add(Messages);
@@ -84,7 +87,7 @@ public class Messenger extends JPanel implements ActionListener {
 
 
                     }
-                    textField.setText(">");
+
                     try{
                         Thread.sleep(27);
                     }catch (InterruptedException e){

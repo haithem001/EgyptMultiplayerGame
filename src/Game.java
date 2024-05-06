@@ -101,11 +101,6 @@ public class Game extends JPanel implements ActionListener{
         LoadFont();
 
 
-        messageField = new JTextField(10);
-        messageField.setToolTipText("Enter User Name");
-        messageField.setBounds(10,10,200,200);
-        messageField.setVisible(true);
-        add(messageField);
 
 
     }
