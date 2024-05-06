@@ -41,7 +41,6 @@ public class Bullet {
         Vx= (XLEN  / length) ;
         Vy= (YLEN / length) ;
 
-        angle = Math.atan2(MouseX - startX, MouseY - startY) + Math.PI;
 
 
 

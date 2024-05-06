@@ -13,8 +13,10 @@ import java.util.Scanner;
 
 
 public class Game extends JPanel implements ActionListener{
+    public JTextField messageField;
     public Dude dude1;
     public Dude dude;
+
     public int playerID;
     private Socket socket;
     private ReadFromServer rfsRunnable;
@@ -31,8 +33,29 @@ public class Game extends JPanel implements ActionListener{
     private int Score;
     private String ip;
     private int port;
+
+    public String getMsg1() {
+        return msg1;
+    }
+
+    private String msg1;
+
+
+    public String getNickname1() {
+        return nickname1;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
     private String nickname1;
     private Scanner sc=new Scanner(System.in);
+
+    public String getMsg() {
+        return msg;
+    }
+
     private String msg = "";
     public void setMsg(String msg) {
         this.msg = msg;
@@ -43,7 +66,7 @@ public class Game extends JPanel implements ActionListener{
 
     private String nickname;
     private Image background ;
-
+    private int ExplosionX,ExplosionY;
     private final int platform = 850;
     private final List<BLOCK> BLOCKS = new ArrayList<>();
     private final List<ALIEN> ALIENS = new ArrayList<>();
@@ -72,15 +95,20 @@ public class Game extends JPanel implements ActionListener{
         BLOCKS.add(new BLOCK(600, 861, true, true));
         //!BASE BLOCK[0]
         BLOCKS.get(0).BODY.setLocation(600, 861);
+        BLOCKS.get(0).BODY.setLocation(600, 861);
         BLOCKS.get(0).BODY.setBounds(600, 861, 70, 70);
         initGame();
         LoadFont();
 
 
+        messageField = new JTextField(10);
+        messageField.setToolTipText("Enter User Name");
+        messageField.setBounds(10,10,200,200);
+        messageField.setVisible(true);
+        add(messageField);
+
+
     }
-
-
-
 
     public void initGame() {
 
@@ -407,8 +435,10 @@ public class Game extends JPanel implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if(dude.getHealth()<0||dude1.getHealth()<0){
+
+        if(dude.getHealth()<0||dude1.getHealth()<0||BLOCKS.get(0).getHealth()<0){
             timer.stop();
+
         }
         for (BLOCK B : BLOCKS) {
             if (B.isBuilded()) {
@@ -417,24 +447,21 @@ public class Game extends JPanel implements ActionListener{
             }
         }
 
-        if (BLOCKS.size()>5){
-            if(ALIENS.isEmpty()){
-                ALIENS.add(new ALIEN(ax.get(ALIENX), -40));
-                ALIENX++;
-                if (ALIENX>9){
-                    ALIENX=0;
-                }
-            }
-        }
+
 
         dude.move(getWidth(), getHeight(), BLOCKS, platform);
 
 
 
 
+
+
+
+        dude.Bullets.removeIf(B -> !B.getVisible());
+        dude1.Bullets.removeIf(B -> !B.getVisible());
+        ALIENS.removeIf(A -> !A.isAlive());
+        
         Checkill();
-
-
 
         if (!dude.Bullets.isEmpty())
         {
@@ -448,6 +475,7 @@ public class Game extends JPanel implements ActionListener{
                 B.move(getWidth(),getHeight());
             }
         }
+
 
         for (ALIEN A : ALIENS) {
             if (A.getDy()==0){
@@ -483,12 +511,18 @@ public class Game extends JPanel implements ActionListener{
             }
         }
 
-        dude.Bullets.removeIf(B -> !B.getVisible());
-        dude1.Bullets.removeIf(B -> !B.getVisible());
+
+        if (BLOCKS.size()>5){
+            if(ALIENS.isEmpty()){
+                ALIENS.add(new ALIEN(ax.get(ALIENX), -40));
+                ALIENX++;
+                if (ALIENX>9){
+                    ALIENX=0;
+                }
+            }
+        }
 
 
-
-        ALIENS.removeIf(A -> !A.isAlive());
 
 
 
@@ -500,7 +534,6 @@ public class Game extends JPanel implements ActionListener{
             this.in = in;
             System.out.println("Reading from server Runnable created");
         }
-        String msg1;
         int block1x,block1y;
         int bullet1x,bullet1y;
         public void run(){
@@ -528,9 +561,7 @@ public class Game extends JPanel implements ActionListener{
                         dude1.setHealth(in.readInt());
                         msg1= in.readUTF();
                         nickname1 = in.readUTF();
-                        if(!msg1.equals("")){
-                            System.out.println(nickname1+": "+msg1);
-                        }
+
 
 
 
@@ -566,9 +597,7 @@ public class Game extends JPanel implements ActionListener{
                                 e.printStackTrace();
                             }
                         }
-
-                    }
-                });
+                        }});
                 sendmsgThread.start();
                 readThread.start();
                 writeThread.start();
@@ -650,7 +679,14 @@ public class Game extends JPanel implements ActionListener{
             super.paintComponent(g);
 
             Graphics2D g2d = (Graphics2D) g;
+
             g2d.drawImage(background, 0, 210, this);
+            g2d.setColor(Color.cyan);
+            g2d.setFont(new Font("Georgia", Font.PLAIN, 20));
+            g2d.drawString(nickname,dude.getX()+(dude.getWidth()/3),dude.getY());
+            g2d.setColor(Color.cyan);
+            g2d.setFont(new Font("Georgia", Font.PLAIN, 20));
+            g2d.drawString(nickname1,(dude1.getX()+dude1.getWidth()/3),dude1.getY());
              XLEN = (int)( MouseX - (dude.getX() + ((float) dude.getWidth() / 2)));
              YLEN = (int)(MouseY - (dude.getY() + ((float) dude.getHeight() / 2)));
 
@@ -692,7 +728,11 @@ public class Game extends JPanel implements ActionListener{
                 g2d.setColor(c);
                 g2d.fillOval(X.getX(), X.getY(), 10, 10);
             }
-
+            for (ALIEN alien : newAliens) {
+                if (!alien.isAlive()){
+                    g2d.drawImage(alien.getImgExplode(), alien.getX(), alien.getY(), this);
+                }
+            }
             for (ALIEN alien : newAliens) {
                 List<AlienBullet> newAlienBullets = new ArrayList<>(alien.bullets);
                 for (AlienBullet X : newAlienBullets) {

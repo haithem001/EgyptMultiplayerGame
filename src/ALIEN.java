@@ -20,12 +20,16 @@ public class ALIEN {
     public Rectangle BODY;
     public List<AlienBullet> bullets=new ArrayList<>();
     private final Image img ;
+    private final Image imgExplode;
+
 
     public  ALIEN (int x, int y) {
 
         this.x = x;
         this.y = y;
         this.startX=x;
+        ImageIcon image=new ImageIcon("/src/Explosion.png");
+        this.imgExplode=image.getImage();
 
         BODY=new Rectangle(x,y,w,h);
         this.alive=true;
@@ -44,6 +48,9 @@ public class ALIEN {
     }
     public Image getImage() {
         return this.img;
+    }
+    public Image getImgExplode() {
+        return imgExplode;
     }
 
     public  int getX() {

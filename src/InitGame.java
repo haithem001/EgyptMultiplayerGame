@@ -57,10 +57,12 @@ public class InitGame extends JFrame implements ActionListener{
 		p1.add(Jbutton);
 
 
-
+		ALL.setBackground(Color.black);
 		ALL.add(plabel);
 		ALL.setLayout(new GridLayout(3,1,0,40));
+
 		ALL.add(p1);
+
 
 		this.add(ALL);
 

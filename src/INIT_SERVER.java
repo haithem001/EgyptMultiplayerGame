@@ -1,7 +1,9 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class INIT_SERVER extends JFrame implements ActionListener {
     // JTextField
@@ -33,11 +35,32 @@ public class INIT_SERVER extends JFrame implements ActionListener {
          JPanel p = new JPanel();
          p.setLayout(new GridLayout(5,1,0,0));
          p.setBackground(Color.black);
-         p.add(l);
-         p.add(PORT);
-         p.add(l1);
-         p.add(NICKNAME);
+        l.setForeground(Color.orange);
+        l.setFont(new Font("Serif", Font.PLAIN, 30));
+        l1.setForeground(Color.orange);
+        l1.setFont(new Font("Serif", Font.PLAIN, 30));
 
+         p.add(l);
+        PORT.setFont(new Font("Serif", Font.BOLD, 30));
+        PORT.setBackground(Color.darkGray);
+        PORT.setForeground(Color.white);
+        PORT.setHorizontalAlignment(JTextField.CENTER);
+        PORT.setBorder(new LineBorder(Color.GRAY, 4));
+         p.add(PORT);
+        NICKNAME.setFont(new Font("Serif", Font.BOLD, 30));
+        NICKNAME.setBackground(Color.darkGray);
+        NICKNAME.setForeground(Color.white);
+        NICKNAME.setHorizontalAlignment(JTextField.CENTER);
+        NICKNAME.setBorder(new LineBorder(Color.GRAY, 4));
+         p.add(l1);
+
+         p.add(NICKNAME);
+        j.setFont(new Font("Serif", Font.BOLD, 50));
+        j.setBackground(Color.black);
+
+        j.setForeground(Color.white);
+        j.setHorizontalAlignment(JTextField.CENTER);
+        j.setBorder(new LineBorder(Color.GRAY, 4));
          p.add(j);
 
 
@@ -75,7 +98,8 @@ public void actionPerformed(ActionEvent e) {
         });
 
         t.start();
-        LaunchGame server = new LaunchGame(NICKNAME.getText(),"localhost", Integer.parseInt(PORT.getText()));
+        LaunchGame server = null;
+        server = new LaunchGame(NICKNAME.getText(),"localhost", Integer.parseInt(PORT.getText()));
         System.out.println(NICKNAME.getText());
         server.setSize(this.getSize());
         server.setVisible(true);
